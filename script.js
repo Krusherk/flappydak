@@ -4,10 +4,7 @@ let img = document.getElementById('bird-1');
 let sound_point = new Audio('sounds effect/point.mp3');
 let sound_die = new Audio('sounds effect/die.mp3');
 
-// getting bird element properties
 let bird_props = bird.getBoundingClientRect();
-
-// This method returns DOMReact -> top, right, bottom, left, x, y, width and height
 let background = document.querySelector('.background').getBoundingClientRect();
 
 let score_val = document.querySelector('.score_val');
@@ -15,15 +12,11 @@ let message = document.querySelector('.message');
 let score_title = document.querySelector('.score_title');
 
 let game_state = 'Start';
-img.style.display = 'none';
 message.classList.add('messageStyle');
 
 document.addEventListener('keydown', (e) => {
-    
     if(e.key == 'Enter' && game_state != 'Play'){
-        document.querySelectorAll('.pipe_sprite').forEach((e) => {
-            e.remove();
-        });
+        document.querySelectorAll('.pipe_sprite').forEach((e) => e.remove());
         img.style.display = 'block';
         bird.style.top = '40vh';
         game_state = 'Play';
@@ -34,7 +27,7 @@ document.addEventListener('keydown', (e) => {
         play();
     }
 });
-// Allow tap to start the game
+
 document.addEventListener('touchstart', () => {
     if (game_state != 'Play') {
         document.querySelectorAll('.pipe_sprite').forEach((e) => e.remove());
@@ -49,7 +42,6 @@ document.addEventListener('touchstart', () => {
     }
 });
 
-
 function play(){
     function move(){
         if(game_state != 'Play') return;
@@ -61,7 +53,7 @@ function play(){
 
             if(pipe_sprite_props.right <= 0){
                 element.remove();
-            }else{
+            } else {
                 if(bird_props.left < pipe_sprite_props.left + pipe_sprite_props.width && bird_props.left + bird_props.width > pipe_sprite_props.left && bird_props.top < pipe_sprite_props.top + pipe_sprite_props.height && bird_props.top + bird_props.height > pipe_sprite_props.top){
                     game_state = 'End';
                     message.innerHTML = 'Game Over'.fontcolor('red') + '<br>Press Enter To Restart';
@@ -69,9 +61,9 @@ function play(){
                     img.style.display = 'none';
                     sound_die.play();
                     return;
-                }else{
+                } else {
                     if(pipe_sprite_props.right < bird_props.left && pipe_sprite_props.right + move_speed >= bird_props.left && element.increase_score == '1'){
-                        score_val.innerHTML =+ score_val.innerHTML + 1;
+                        score_val.innerHTML = +score_val.innerHTML + 1;
                         sound_point.play();
                     }
                     element.style.left = pipe_sprite_props.left - move_speed + 'px';
@@ -93,24 +85,16 @@ function play(){
             }
         });
 
-        document.addEventListener('keyup', (e) => {
-            if(e.key == 'ArrowUp' || e.key == ' '){
-                img.src = 'images/Bird.png';
+        document.addEventListener('touchstart', () => {
+            if (game_state == 'Play') {
+                img.src = 'images/Bird-2.png';
+                bird_dy = -7.6;
             }
         });
-// Allow tap to make the bird fly
-document.addEventListener('touchstart', () => {
-    if (game_state == 'Play') {
-        img.src = 'images/Bird-2.png';
-        bird_dy = -7.6;
-        setTimeout(() => {
-            img.src = 'images/Bird.png';
-        }, 100);
-    }
-});
-document.addEventListener('gesturestart', function (e) {
-    e.preventDefault();
-});
+
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
 
         if(bird_props.top <= 0 || bird_props.bottom >= background.bottom){
             game_state = 'End';
@@ -126,7 +110,6 @@ document.addEventListener('gesturestart', function (e) {
     requestAnimationFrame(apply_gravity);
 
     let pipe_seperation = 0;
-
     let pipe_gap = 35;
 
     function create_pipe(){
