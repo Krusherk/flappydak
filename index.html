@@ -1,69 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flappy Dak Game</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      margin: 0;
-      background: url('images/background.png') no-repeat center center fixed;
-      background-size: cover;
-      font-family: 'Courier New', monospace;
-      image-rendering: pixelated;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flappy Dak - Home</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        body {
+            margin: 0;
+            background-image: url('images/dakdak.png');
+            background-size: cover;
+            background-position: center;
+            font-family: 'Press Start 2P', cursive;
+            color: white;
+            text-align: center;
+        }
 
-    .home-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: white;
-      text-align: center;
-    }
+        .home-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 40px;
+        }
 
-    .home-container h1 {
-      font-size: 48px;
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 4px #000;
-    }
+        h1 {
+            font-size: 22px;
+            text-shadow: 2px 2px black;
+        }
 
-    .home-container a {
-      font-size: 24px;
-      padding: 10px 20px;
-      background-color: #111;
-      color: white;
-      text-decoration: none;
-      border: 2px solid white;
-      border-radius: 10px;
-      transition: background 0.3s;
-    }
+        .start-btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: 2px solid white;
+            background: black;
+            color: white;
+            cursor: pointer;
+        }
 
-    .home-container a:hover {
-      background-color: white;
-      color: black;
-    }
-
-    footer {
-      position: fixed;
-      bottom: 10px;
-      width: 100%;
-      text-align: center;
-      font-family: monospace;
-      color: white;
-    }
-  </style>
+        footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-family: sans-serif;
+            color: white;
+        }
+    </style>
 </head>
 <body>
-  <div class="home-container">
-    <h1>Welcome to Flappy Dak</h1>
-    <a href="game.html">Start Game</a>
-  </div>
-
-  <footer>made by crack</footer>
+    <div class="home-container">
+        <h1>🐤 Welcome to Flappy Dak</h1>
+        <a href="game.html">
+            <button class="start-btn">Start Game</button>
+        </a>
+    </div>
+    <footer>made by crack</footer>
 </body>
 </html>
-
