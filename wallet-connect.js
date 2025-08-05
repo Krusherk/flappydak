@@ -1,8 +1,11 @@
-// wallet-connect.js
-
 document.addEventListener("DOMContentLoaded", () => {
   const connectButton = document.getElementById("connectWalletBtn");
   const walletDisplay = document.getElementById("walletAddressDisplay");
+
+  if (!connectButton) {
+    console.error("❌ Connect button not found in DOM!");
+    return;
+  }
 
   connectButton.addEventListener("click", async () => {
     try {
@@ -19,12 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
       walletDisplay.textContent = `Connected: ${address}`;
       localStorage.setItem("flappy_wallet", address);
 
-      // Optional: send to backend
-      // await fetch('/api/connect', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ address }),
-      // });
     } catch (err) {
       console.error("Wallet connect error:", err);
       alert("Failed to connect wallet");
