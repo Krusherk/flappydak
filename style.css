@@ -1,33 +1,109 @@
-#wallet-ui button {
-  background: linear-gradient(135deg, #4a90e2, #357ABD);
-  border: none;
-  color: white;
-  font-weight: 600;
-  font-size: 1.1rem;
-  padding: 12px 28px;
-  margin: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 6px 12px rgba(53, 122, 189, 0.5);
-  user-select: none;
-  min-width: 180px;
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.background {
+	height: 100vh;
+	width: 100vw;
+	background: url('images/background-img.png') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+.bird {
+	height: 100px;
+	width: 130px;
+	position: fixed;
+	top: 40vh;
+	left: 30vw;
+	z-index: 100;
+}
+.pipe_sprite {
+	position: fixed;
+	top: 40vh;
+	left: 80vw;
+	height: 60vh;
+	width: 6vw;
+	background:radial-gradient(lightgreen 50%, green);
+	border: 5px solid black;
+}
+.message {
+	position: absolute;
+	z-index: 10;
+	color: black;
+	top: 30%;
+	left: 50%;
+	font-size: 4em;
+	transform: translate(-50%, -50%);
+	text-align: center;
+}
+.messageStyle{
+	background: white;
+	padding: 30px;
+	box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+	border-radius: 5%;
+}
+.score {
+	position: fixed;
+	z-index: 10;
+	height: 10vh;
+	font-size: 10vh;
+	font-weight: 100;
+	color: white;
+	-webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: black;
+	top: 0;
+	left: 0;
+	margin: 10px;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.score_val {
+	color: gold;
+	font-weight: bold;
+}
+@media only screen and (max-width: 768px) {
+    .message {
+        font-size: 5vw;
+        top: 50%;
+        white-space: nowrap;
+    }
+
+    .score {
+        font-size: 8vw;
+    }
+	.bird {
+		cursor: grab;
+	}
+	
+	.pipe_sprite:hover {
+		cursor: not-allowed;
+	}
+	
+    .bird {
+        width: 80px;
+        height: 60px;
+        left: 20vw;
+    }
+
+    .pipe_sprite {
+        width: 12vw;
+    }
+}
+body {
+    cursor: pointer; /* Common choices: default, pointer, crosshair, move, grab */
 }
 
-#wallet-ui button:hover {
-  background: linear-gradient(135deg, #357ABD, #4a90e2);
-  box-shadow: 0 8px 20px rgba(53, 122, 189, 0.7);
+body {
+    cursor: url('images/bird-cursor.png'), auto;
 }
 
-#wallet-ui button:active {
-  background: #2a5d99;
-  box-shadow: 0 4px 8px rgba(40, 100, 150, 0.6);
-  transform: translateY(1px);
+html, body {
+    touch-action: manipulation;
 }
-
-#wallet-ui button:disabled {
-  background: #bbb;
-  box-shadow: none;
-  cursor: not-allowed;
-  color: #666;
+* {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
 }
