@@ -3,28 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
     <link rel="icon" href="data:," />
-
     <title>Flappy Dak Game</title>
+
+    <!-- Pixelated Font -->
+    <link href="https://fonts.cdnfonts.com/css/press-start-2p" rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
+
+    <style>
+        .pixel-font {
+            font-family: 'Press Start 2P', monospace;
+            text-shadow: 1px 1px 0 black;
+        }
+        #homepage {
+            text-align: center;
+            margin-top: 15vh;
+            color: white;
+        }
+        #startButton {
+            padding: 12px 24px;
+            font-size: 14px;
+            background: black;
+            color: white;
+            border: 3px solid white;
+            cursor: pointer;
+            font-family: 'Press Start 2P', monospace;
+        }
+        #startButton:hover {
+            background: white;
+            color: black;
+        }
+    </style>
 </head>
 <body>
+
+<!-- HOMEPAGE -->
+<div id="homepage">
+    <h1 class="pixel-font">🐦 Flappy Dak</h1>
+    <p class="pixel-font">Press Start to Begin</p>
+    <button id="startButton">▶ START GAME</button>
+    <p style="margin-top:20px" class="pixel-font">Made by crack</p>
+</div>
+
+<!-- GAME AREA -->
+<div id="gameContainer" style="display: none;">
     <div class="background"></div>
     <img src="images/Bird-2.png" alt="bird-img" class="bird" id="bird-1" width="300">
-    <div class="message">
+
+    <div class="message pixel-font">
         Enter To Start Game <p><span style="color: red;">&uarr;</span> ArrowUp to Control</p>
     </div>
-    <div class="score">
+
+    <div class="score pixel-font">
         <span class="score_title"></span>
         <span class="score_val"></span>
     </div>
 
-<footer style="position: fixed; bottom: 10px; width: 100%; text-align: center; font-family: sans-serif; color: white;">
-    made by crack
-</footer>
+    <footer style="position: fixed; bottom: 10px; width: 100%; text-align: center; color: white;" class="pixel-font">
+        made by crack
+    </footer>
+</div>
+
+<script>
+    const startButton = document.getElementById("startButton");
+    const homepage = document.getElementById("homepage");
+    const gameContainer = document.getElementById("gameContainer");
+
+    startButton.addEventListener("click", () => {
+        homepage.style.display = "none";
+        gameContainer.style.display = "block";
+    });
+</script>
+
 </body>
 </html>
