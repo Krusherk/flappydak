@@ -142,4 +142,12 @@ html, body {
   box-shadow: none;
   cursor: not-allowed;
   color: #666;
+
+#wallet-ui {
+  margin: 20px auto;
+  text-align: center;
+  background: transparent; /* no background */
+  width: fit-content;      /* shrink to buttons width */
+  user-select: none;
 }
+
