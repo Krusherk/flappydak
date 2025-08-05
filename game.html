@@ -1,24 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Flappy Dak Game</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
+    <meta charset="UTF-8" />
+    <title>Flappy Dak - Game</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #87CEEB;
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 14px;
+            color: white;
+            text-shadow: 2px 2px #000;
+        }
+
+        #instructions {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 10px;
+            color: white;
+            text-shadow: 1px 1px #000;
+        }
+
+        #gameOverMsg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: white;
+            background: rgba(0,0,0,0.6);
+            padding: 10px 20px;
+            border: 1px solid white;
+            display: none;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-  <div class="background"></div>
-  <img src="images/Bird-2.png" alt="bird-img" class="bird" id="bird-1" width="300">
-  <div class="message">
-    Enter To Start Game <p><span style="color: red;">&uarr;</span> ArrowUp to Control</p>
-  </div>
-  <div class="score">
-    <span class="score_title"></span>
-    <span class="score_val"></span>
-  </div>
+    <canvas id="gameCanvas" width="480" height="640"></canvas>
+    <div id="score">Score: 0</div>
+    <div id="instructions">↑ to flap | Enter to start</div>
+    <div id="gameOverMsg">Game Over<br/>Press Enter to Restart</div>
 
-  <footer>made by crack</footer>
+    <script src="script.js"></script>
 </body>
 </html>
