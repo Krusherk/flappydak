@@ -4,6 +4,7 @@
 	-webkit-font-smoothing: none;
 	-moz-osx-font-smoothing: grayscale;
 }
+
 .background {
 	height: 100vh;
 	width: 100vw;
@@ -41,9 +42,13 @@
 	color: black;
 	top: 30%;
 	left: 50%;
-	font-size: 4em;
+	font-size: 14px;              /* UPDATED: Smaller size for pixel font */
+	line-height: 1.4;             /* UPDATED: Tighter spacing */
 	transform: translate(-50%, -50%);
 	text-align: center;
+	padding: 10px;                /* UPDATED: Add padding for spacing */
+	background: white;            /* OPTIONAL: Prevent background image bleed */
+	border-radius: 5px;           /* OPTIONAL: Small rounding */
 }
 
 .messageStyle {
@@ -72,6 +77,13 @@
 	color: gold;
 	font-weight: bold;
 }
+
+footer {
+	font-size: 20px;               /* UPDATED: Bigger text */
+	text-align: center;
+	margin-top: 40px;
+	font-family: 'Press Start 2P', monospace; /* UPDATED: Pixelated font */
+}                                    
 
 @media only screen and (max-width: 768px) {
     .message {
@@ -120,4 +132,3 @@ html, body {
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
 }
-
