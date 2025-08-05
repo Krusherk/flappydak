@@ -19,8 +19,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const signer = await provider.getSigner();
       const address = await signer.getAddress();
 
+      // ✅ Display and store
       walletDisplay.textContent = `Connected: ${address}`;
       localStorage.setItem("flappy_wallet", address);
+
+      // ✅ Send to backend
+      await fetch("/api/connect", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ address })
+      });
+
+      console.log("✅ Wallet address sent to backend:", address);
 
     } catch (err) {
       console.error("Wallet connect error:", err);
