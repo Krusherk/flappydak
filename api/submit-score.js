@@ -1,42 +1,30 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
-  "https://ffhgkerkuqtkysyfzubp.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-);
+  'https://ffhgkerkuqtkysyfzubp.supabase.co',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Only POST allowed' })
   }
 
-  const { address, score } = req.body;
+  const { address, score } = req.body
 
-  if (!address || typeof score !== "number") {
-    return res.status(400).json({ error: "Address and score required" });
+  if (!address || typeof score !== 'number') {
+    return res.status(400).json({ error: 'Missing or invalid data' })
   }
 
-  // Update score only if it's higher than previous
-  const { data: existing, error } = await supabase
-    .from("wallets")
-    .select("score")
-    .eq("address", address)
-    .single();
+  // Insert into leaderboard
+  const { error } = await supabase
+    .from('leaderboard')
+    .insert({ address, score })
 
-  if (error || !existing) {
-    return res.status(404).json({ error: "Wallet not found" });
+  if (error) {
+    console.error('Insert failed:', error)
+    return res.status(500).json({ error: 'Failed to submit score' })
   }
 
-  if (score > existing.score) {
-    const { error: updateError } = await supabase
-      .from("wallets")
-      .update({ score })
-      .eq("address", address);
-
-    if (updateError) {
-      return res.status(500).json({ error: "Failed to update score" });
-    }
-  }
-
-  return res.status(200).json({ success: true });
+  return res.status(200).json({ success: true })
 }

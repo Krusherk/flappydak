@@ -163,3 +163,32 @@ function play() {
   }
   requestAnimationFrame(create_pipe);
 }
+function fetchLeaderboard() {
+  fetch('/api/leaderboard')
+    .then(res => res.json())
+    .then(data => {
+      const leaderboard = document.createElement('div');
+      leaderboard.className = 'leaderboard';
+
+      const title = document.createElement('h2');
+      title.innerText = 'Leaderboard';
+      leaderboard.appendChild(title);
+
+      const list = document.createElement('ul');
+
+      data.forEach((entry, index) => {
+        const item = document.createElement('li');
+        const shortAddress = entry.address.slice(0, 6) + '...' + entry.address.slice(-4);
+        item.textContent = `${index + 1}. ${shortAddress} - ${entry.score}`;
+        list.appendChild(item);
+      });
+
+      leaderboard.appendChild(list);
+      document.body.appendChild(leaderboard);
+    })
+    .catch(err => {
+      console.error('Failed to load leaderboard:', err);
+    });
+}
+
+window.addEventListener('DOMContentLoaded', fetchLeaderboard);

@@ -131,4 +131,40 @@ html, body {
 * {
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
+
+}
+.leaderboard {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  width: 250px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 10px;
+  border: 2px solid white;
+  z-index: 200;
+  border-radius: 10px;
+}
+
+.leaderboard h2 {
+  font-size: 12px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.leaderboard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.leaderboard li {
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
