@@ -10,17 +10,9 @@
 
     <title>Flappy Dak Game</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Ethers.js -->
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script src="script.js" defer></script>
 </head>
 <body>
-    <div id="wallet-ui">
-        <button id="connectBtn">Connect Wallet</button>
-        <button id="buyBtn">Buy Ticket (1 MON)</button>
-        <p id="status"></p>
-    </div>
-    
     <div class="background"></div>
     <img src="images/Bird-2.png" alt="bird-img" class="bird" id="bird-1" width="300">
     <div class="message">
@@ -31,71 +23,8 @@
         <span class="score_val"></span>
     </div>
 
-    <footer style="position: fixed; bottom: 10px; width: 100%; text-align: center; font-family: sans-serif; color: white;">
-        made by crack
-    </footer>
-
-    <script>
-    const MONAD_RPC = "https://testnet-rpc.monad.xyz";
-    const CONTRACT_ADDRESS = "0xB6cf10CC97894696552Cf87952400c8E213EBE18";
-    const ABI = [
-        "function buyTicket() payable",
-        "function hasAccess(address) view returns (bool)"
-    ];
-
-    let provider;
-    let signer;
-    let contract;
-
-    async function connectWallet() {
-        if (typeof window.ethereum === "undefined") {
-            alert("Please install MetaMask!");
-            return;
-        }
-
-        try {
-            await ethereum.request({ method: "eth_requestAccounts" });
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            signer = provider.getSigner();
-            contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-            document.getElementById("status").innerText = "Wallet connected.";
-        } catch (err) {
-            console.error(err);
-            document.getElementById("status").innerText = "Connection failed.";
-        }
-    }
-
-    async function buyTicket() {
-        try {
-            const tx = await contract.buyTicket({ value: ethers.utils.parseEther("1") });
-            await tx.wait();
-            document.getElementById("status").innerText = "Ticket bought!";
-        } catch (err) {
-            console.error(err);
-            document.getElementById("status").innerText = "Error buying ticket.";
-        }
-    }
-
-    // Optional: Check access on load
-    async function checkAccess() {
-        try {
-            const user = await signer.getAddress();
-            const has = await contract.hasAccess(user);
-            document.getElementById("status").innerText = has
-                ? "You have access to play."
-                : "You need to buy a ticket.";
-        } catch (e) {
-            console.log("Access check skipped");
-        }
-    }
-
-    document.getElementById("connectBtn").onclick = async () => {
-        await connectWallet();
-        await checkAccess();
-    };
-
-    document.getElementById("buyBtn").onclick = buyTicket;
-    </script>
+<footer style="position: fixed; bottom: 10px; width: 100%; text-align: center; font-family: sans-serif; color: white;">
+    made by crack
+</footer>
 </body>
 </html>
-
