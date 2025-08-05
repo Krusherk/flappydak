@@ -1,0 +1,33 @@
+// wallet-connect.js
+
+document.addEventListener("DOMContentLoaded", () => {
+  const connectButton = document.getElementById("connectWalletBtn");
+  const walletDisplay = document.getElementById("walletAddressDisplay");
+
+  connectButton.addEventListener("click", async () => {
+    try {
+      if (!window.ethereum) {
+        alert("MetaMask not found");
+        return;
+      }
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
+      const address = await signer.getAddress();
+
+      walletDisplay.textContent = `Connected: ${address}`;
+      localStorage.setItem("flappy_wallet", address);
+
+      // Optional: send to backend
+      // await fetch('/api/connect', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ address }),
+      // });
+    } catch (err) {
+      console.error("Wallet connect error:", err);
+      alert("Failed to connect wallet");
+    }
+  });
+});

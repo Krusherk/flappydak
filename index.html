@@ -1,67 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flappy Dak - Home</title>
-    <link rel="stylesheet" href="style.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            background-image: url('images/dakdak.png');
-            background-size: cover;
-            background-position: center;
-            font-family: 'Press Start 2P', cursive;
-            color: white;
-            text-align: center;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flappy Dak - Home</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
-        body, h1, .start-btn, footer {
-            -webkit-font-smoothing: none;
-            -moz-osx-font-smoothing: grayscale;
-            font-smooth: never;
-        }
+  <style>
+    body {
+      margin: 0;
+      background-image: url('images/dakdak.png');
+      background-size: cover;
+      background-position: center;
+      font-family: 'Press Start 2P', cursive;
+      color: white;
+      text-align: center;
+    }
 
-        .home-container {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 40px;
-        }
+    body, h1, .start-btn, footer {
+      -webkit-font-smoothing: none;
+      -moz-osx-font-smoothing: grayscale;
+      font-smooth: never;
+    }
 
-        h1 {
-            font-size: 22px;
-            text-shadow: 2px 2px black;
-        }
+    .home-container {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
 
-        .start-btn {
-            padding: 10px 20px;
-            font-size: 14px;
-            border: 2px solid white;
-            background: black;
-            color: white;
-            cursor: pointer;
-        }
+    h1 {
+      font-size: 22px;
+      text-shadow: 2px 2px black;
+    }
 
-        footer {
-            position: fixed;
-            bottom: 10px;
-            width: 100%;
-            text-align: center;
-            font-family: sans-serif;
-            color: white;
-        }
-    </style>
+    .start-btn, #connectWalletBtn {
+      padding: 10px 20px;
+      font-size: 14px;
+      border: 2px solid white;
+      background: black;
+      color: white;
+      cursor: pointer;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      font-family: sans-serif;
+      color: white;
+    }
+  </style>
 </head>
 <body>
-    <div class="home-container">
-        <h1> Welcome to Flappy Dak</h1>
-        <a href="game.html">
-            <button class="start-btn">Start Game</button>
-        </a>
-    </div>
-    <footer>made by crack</footer>
+  <div class="home-container">
+    <h1>Welcome to Flappy Dak</h1>
+
+    <!-- Wallet Connect Button -->
+    <button id="connectWalletBtn">Connect Wallet</button>
+    <div id="walletAddressDisplay"></div>
+
+    <!-- Start Game -->
+    <a href="game.html">
+      <button class="start-btn">Start Game</button>
+    </a>
+  </div>
+
+  <footer>made by crack</footer>
+
+  <!-- ✅ Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
+  <script src="wallet-connect.js"></script>
+  <script src="flappy.js"></script>
 </body>
 </html>
