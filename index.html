@@ -2,59 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flappy Dak - Home</title>
+    <title>Flappy Dak - Game</title>
     <link rel="stylesheet" href="style.css" />
     <style>
         body {
             margin: 0;
-            background-image: url('images/dakdak.png');
-            background-size: cover;
-            background-position: center;
+            overflow: hidden;
+            background: #000;
             font-family: 'Press Start 2P', cursive;
-            color: white;
-            text-align: center;
         }
 
-        .home-container {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 40px;
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #87CEEB;
         }
 
-        h1 {
-            font-size: 22px;
-            text-shadow: 2px 2px black;
-        }
-
-        .start-btn {
-            padding: 10px 20px;
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
             font-size: 14px;
-            border: 2px solid white;
-            background: black;
             color: white;
-            cursor: pointer;
+            text-shadow: 2px 2px #000;
         }
 
-        footer {
-            position: fixed;
+        #instructions {
+            position: absolute;
             bottom: 10px;
-            width: 100%;
-            text-align: center;
-            font-family: sans-serif;
+            left: 10px;
+            font-size: 10px;
             color: white;
+            text-shadow: 1px 1px #000;
+        }
+
+        #gameOverMsg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: white;
+            background: rgba(0,0,0,0.6);
+            padding: 10px 20px;
+            border: 1px solid white;
+            display: none;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <div class="home-container">
-        <h1>🐤 Welcome to Flappy Dak</h1>
-        <a href="game.html">
-            <button class="start-btn">Start Game</button>
-        </a>
-    </div>
-    <footer>made by crack</footer>
+    <canvas id="gameCanvas" width="480" height="640"></canvas>
+    <div id="score">Score: 0</div>
+    <div id="instructions">↑ to flap | Enter to start</div>
+    <div id="gameOverMsg">Game Over<br/>Press Enter to Restart</div>
+
+    <script src="script.js"></script>
 </body>
 </html>
