@@ -167,24 +167,13 @@ function play() {
 function submitScore() {
   const finalScore = parseInt(score_val.innerHTML, 10);
   const address = localStorage.getItem("flappy_wallet");
-
   if (!address || finalScore <= 0) return;
 
-  const leaderboard = JSON.parse(localStorage.getItem("flappy_leaderboard") || "[]");
-
-  const existing = leaderboard.find(entry => entry.address === address);
-
-  if (existing) {
-    if (finalScore > existing.score) {
-      existing.score = finalScore;
-      existing.timestamp = Date.now(); // update time
-    }
-  } else {
-    leaderboard.push({ address, score: finalScore, timestamp: Date.now() });
-  }
-
-  leaderboard.sort((a, b) => b.score - a.score);
-  localStorage.setItem("flappy_leaderboard", JSON.stringify(leaderboard));
+  fetch("http://localhost:3000/api/submit-score", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ address, score: finalScore }),
+  }).catch(err => console.error("Score submit failed:", err));
 }
 
 function formatTimeAgo(timestamp) {
@@ -199,28 +188,18 @@ function formatTimeAgo(timestamp) {
 }
 
 function fetchLeaderboard() {
-  const leaderboard = JSON.parse(localStorage.getItem("flappy_leaderboard") || "[]");
-  const list = document.getElementById("leaderboardList");
-
-  if (!list) return;
-
-  list.innerHTML = "";
-
-  leaderboard.forEach((entry, index) => {
-    const li = document.createElement("li");
-    const rank =
-      index === 0 ? "🥇" :
-      index === 1 ? "🥈" :
-      index === 2 ? "🥉" :
-      `${index + 1}.`;
-    const shortAddr = entry.address.slice(0, 6) + "..." + entry.address.slice(-4);
-    const timeAgo = entry.timestamp ? formatTimeAgo(entry.timestamp) : "";
-    li.classList.add(`top-${index + 1}`);
-    li.innerHTML = `
-      <span class="leaderboard-player">${rank} ${shortAddr}</span>
-      <span class="leaderboard-score">${entry.score}</span>
-      <span class="timestamp">${timeAgo}</span>
-    `;
-    list.appendChild(li);
-  });
+  fetch("http://localhost:3000/api/leaderboard")
+    .then(res => res.json())
+    .then(data => {
+      const list = document.getElementById("leaderboardList");
+      if (!list) return;
+      list.innerHTML = "";
+      data.forEach((entry, index) => {
+        const item = document.createElement("li");
+        const shortAddr = entry.address.slice(0, 6) + "..." + entry.address.slice(-4);
+        item.textContent = `${index + 1}. ${shortAddr} - ${entry.score}`;
+        list.appendChild(item);
+      });
+    })
+    .catch(err => console.error("Failed to fetch leaderboard:", err));
 }
