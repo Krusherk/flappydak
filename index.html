@@ -1,76 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Flappy Dak - Privy Login Test</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html>
+<head>
+  <title>Privy Login Test</title>
+  <script src="https://widget.privy.io/privy.js"></script>
+</head>
+<body>
+  <button id="loginBtn">Login with Privy</button>
+  <div id="walletDisplay"></div>
 
-    <!-- Load Privy -->
-    <script src="https://widget.privy.io/privy.js"></script>
+  <script>
+    window.onload = () => {
+      Privy.init({ appId: "cme0joi9r00fxk10ampyw63t4" });
 
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: #111;
-        color: white;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        margin: 0;
-      }
+      const loginBtn = document.getElementById("loginBtn");
+      const walletDisplay = document.getElementById("walletDisplay");
 
-      button {
-        padding: 12px 24px;
-        font-size: 16px;
-        background-color: #222;
-        color: white;
-        border: 2px solid white;
-        cursor: pointer;
-      }
-
-      #walletAddress {
-        margin-top: 20px;
-        font-size: 14px;
-        color: #ccc;
-      }
-    </style>
-  </head>
-
-  <body>
-    <h1>Privy Login Test</h1>
-    <button id="loginBtn">Login with Privy</button>
-    <div id="walletAddress"></div>
-
-    <script>
-      // Wait until page and Privy load
-      window.onload = () => {
-        // ✅ Initialize Privy
-        Privy.init({
-          appId: "cme0joi9r00fxk10ampyw63t4"
-        });
-
-        // ✅ Attach login button
-        const loginBtn = document.getElementById("loginBtn");
-        const walletDisplay = document.getElementById("walletAddress");
-
-        loginBtn.addEventListener("click", async () => {
-          try {
-            const user = await Privy.login();
-
-            if (user?.wallet?.address) {
-              walletDisplay.innerText = `Wallet: ${user.wallet.address}`;
-              alert("✅ Logged in with Privy!");
-            } else {
-              alert("⚠️ Wallet not returned");
-            }
-          } catch (err) {
-            console.error("❌ Login failed", err);
-            alert("Login failed. Check console for details.");
-          }
-        });
-      };
-    </script>
-  </body>
+      loginBtn.addEventListener("click", async () => {
+        try {
+          const user = await Privy.login();
+          walletDisplay.innerText = "Wallet: " + user.wallet.address;
+        } catch (err) {
+          console.error("Login error:", err);
+        }
+      });
+    };
+  </script>
+</body>
 </html>
