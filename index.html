@@ -1,81 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Flappy Dak - Home</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<script src="wallet-connect.js"></script>
-  <style>
-    body {
-      margin: 0;
-      background-image: url('images/dakdak.png');
-      background-size: cover;
-      background-position: center;
-      font-family: 'Press Start 2P', cursive;
-      color: white;
-      text-align: center;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flappy Dak - Home</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
+    <script src="https://auth.privy.io/v1/script.js"></script>
 
-    body, h1, .start-btn, footer {
-      -webkit-font-smoothing: none;
-      -moz-osx-font-smoothing: grayscale;
-      font-smooth: never;
-    }
+    <style>
+      body {
+        margin: 0;
+        background-image: url('images/dakdak.png');
+        background-size: cover;
+        background-position: center;
+        font-family: 'Press Start 2P', cursive;
+        color: white;
+        text-align: center;
+      }
 
-    .home-container {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-    }
+      body, h1, .start-btn, footer {
+        -webkit-font-smoothing: none;
+        -moz-osx-font-smoothing: grayscale;
+        font-smooth: never;
+      }
 
-    h1 {
-      font-size: 22px;
-      text-shadow: 2px 2px black;
-    }
+      .home-container {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+      }
 
-    .start-btn, #connectWalletBtn {
-      padding: 10px 20px;
-      font-size: 14px;
-      border: 2px solid white;
-      background: black;
-      color: white;
-      cursor: pointer;
-    }
+      h1 {
+        font-size: 22px;
+        text-shadow: 2px 2px black;
+      }
 
-    footer {
-      position: fixed;
-      bottom: 10px;
-      width: 100%;
-      text-align: center;
-      font-family: sans-serif;
-      color: white;
-    }
-  </style>
-</head>
-<body>
-  <div class="home-container">
-    <h1>Welcome to Flappy Dak</h1>
+      .start-btn, #loginBtn {
+        padding: 10px 20px;
+        font-size: 14px;
+        border: 2px solid white;
+        background: black;
+        color: white;
+        cursor: pointer;
+      }
 
-    <!-- Wallet Connect Button -->
-    <button id="connectWalletBtn">Connect Wallet</button>
-    <div id="walletAddressDisplay"></div>
+      footer {
+        position: fixed;
+        bottom: 10px;
+        width: 100%;
+        text-align: center;
+        font-family: sans-serif;
+        color: white;
+      }
+    </style>
+  </head>
 
-    <!-- Pay and Play Button -->
-<button class="start-btn" onclick="payToPlay()">Pay 1 MON to Play</button>
-    </a>
-  </div>
-<button class="start-btn" onclick="payToPlay()" disabled>Pay 1 MON to Play</button>
+  <body>
+    <div class="home-container">
+      <h1>Welcome to Flappy Dak</h1>
 
-  <footer>made by crack</footer>
+      <!-- 🔐 Login with Wallet -->
+      <button id="loginBtn">Login with Wallet</button>
 
-  <!-- ✅ Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
-  <script src="wallet-connect.js"></script>
-  <script src="flappy.js"></script>
-</body>
+      <!-- 💸 Pay and Play -->
+      <button class="start-btn" id="payToPlayBtn">Pay 1 MON to Play</button>
+    </div>
+
+    <footer>made by crack</footer>
+
+    <script>
+      const PRIVY_APP_ID = "cme0joi9r00fxk10ampyw63t4";
+      const contractAddress = "0xb2EFbbC0cFC1898D7d2615856904d3f9785B7D29";
+      const abi = [
+        {
+          "inputs": [],
+          "name": "playAndPay",
+          "outputs": [],
+          "stateMutability": "payable",
+          "type": "function"
+        }
+      ];
+
+      let signer;
+
+      // ✅ Login with Privy
+      document.getElementById("loginBtn").addEventListener("click", () => {
+        window.Privy.showLogin({
+          appId: PRIVY_APP_ID,
+          onSuccess: async (user) => {
+            const wallet = user.wallet.address;
+            localStorage.setItem("flappy_wallet", wallet);
+            console.log("✅ Logged in with:", wallet);
+          }
+        });
+      });
+
+      // 🎮 payToPlay Logic
+      document.getElementById("payToPlayBtn").addEventListener("click", async () => {
+        try {
+          if (!window.ethereum) {
+            alert("Please install MetaMask");
+            return;
+          }
+
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          signer = await provider.getSigner();
+
+          const contract = new ethers.Contract(contractAddress, abi, signer);
+
+          const tx = await contract.playAndPay({ value: ethers.parseEther("1.0") });
+          await tx.wait();
+
+          localStorage.setItem("flappy_paid", "yes");
+          alert("✅ Payment successful! Launching game...");
+          window.location.href = "game.html";
+
+        } catch (err) {
+          console.error("❌ Payment error:", err);
+          alert("Payment failed. Please try again.");
+        }
+      });
+    </script>
+
+    <script src="flappy.js"></script>
+  </body>
 </html>

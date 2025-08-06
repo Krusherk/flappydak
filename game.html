@@ -1,36 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Flappy Dak Game</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- ✅ Add payment check early -->
+  <script>
+    // Block unpaid users from loading the game
+    if (!localStorage.getItem("flappy_paid")) {
+      alert("❌ You must pay to play!");
+      window.location.href = "index.html";
+    }
+  </script>
+
+  <!-- Your original script still loads -->
   <script src="script.js" defer></script>
 </head>
 <body>
   <div class="background"></div>
   <img src="images/Bird-2.png" alt="bird-img" class="bird" id="bird-1" width="300">
+
   <div class="message">
     Enter To Start Game <p><span style="color: red;">&uarr;</span> ArrowUp to Control</p>
   </div>
+
   <div class="score">
     <span class="score_title"></span>
     <span class="score_val"></span>
   </div>
-<div class="leaderboard">
-  <div class="leaderboard-header">
-    <h2>LEADERBOARD</h2>
-    <p class="subtext">Only top players are displayed</p>
-    <div class="leaderboard-toggle">
-      <button class="toggle-btn active" id="highScoreBtn">High Score</button>
-      <button class="toggle-btn" id="maxDistanceBtn">Max Distance</button>
+
+  <div class="leaderboard">
+    <div class="leaderboard-header">
+      <h2>LEADERBOARD</h2>
+      <p class="subtext">Only top players are displayed</p>
+      <div class="leaderboard-toggle">
+        <button class="toggle-btn active" id="highScoreBtn">High Score</button>
+        <button class="toggle-btn" id="maxDistanceBtn">Max Distance</button>
+      </div>
     </div>
+    <ul id="leaderboardList" class="leaderboard-list"></ul>
   </div>
-  <ul id="leaderboardList" class="leaderboard-list"></ul>
-</div>
+
   <footer>made by crack</footer>
 </body>
 </html>
-
