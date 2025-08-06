@@ -163,32 +163,42 @@ function play() {
   }
   requestAnimationFrame(create_pipe);
 }
-function fetchLeaderboard() {
-  fetch('/api/leaderboard')
-    .then(res => res.json())
-    .then(data => {
-      const leaderboard = document.createElement('div');
-      leaderboard.className = 'leaderboard';
 
-      const title = document.createElement('h2');
-      title.innerText = 'Leaderboard';
-      leaderboard.appendChild(title);
+function submitScore() {
+  const finalScore = parseInt(score_val.innerHTML, 10);
+  const address = localStorage.getItem("flappy_wallet");
 
-      const list = document.createElement('ul');
+  if (!address || finalScore <= 0) return;
 
-      data.forEach((entry, index) => {
-        const item = document.createElement('li');
-        const shortAddress = entry.address.slice(0, 6) + '...' + entry.address.slice(-4);
-        item.textContent = `${index + 1}. ${shortAddress} - ${entry.score}`;
-        list.appendChild(item);
-      });
+  const leaderboard = JSON.parse(localStorage.getItem("flappy_leaderboard") || "[]");
 
-      leaderboard.appendChild(list);
-      document.body.appendChild(leaderboard);
-    })
-    .catch(err => {
-      console.error('Failed to load leaderboard:', err);
-    });
+  const existing = leaderboard.find(entry => entry.address === address);
+
+  if (existing) {
+    if (finalScore > existing.score) {
+      existing.score = finalScore;
+    }
+  } else {
+    leaderboard.push({ address, score: finalScore });
+  }
+
+  leaderboard.sort((a, b) => b.score - a.score);
+
+  localStorage.setItem("flappy_leaderboard", JSON.stringify(leaderboard));
 }
 
-window.addEventListener('DOMContentLoaded', fetchLeaderboard);
+function fetchLeaderboard() {
+  const leaderboard = JSON.parse(localStorage.getItem("flappy_leaderboard") || "[]");
+  const list = document.getElementById("leaderboardList");
+
+  if (!list) return;
+
+  list.innerHTML = "";
+
+  leaderboard.forEach((entry, index) => {
+    const item = document.createElement("li");
+    const shortAddr = entry.address.slice(0, 6) + "..." + entry.address.slice(-4);
+    item.textContent = `${index + 1}. ${shortAddr} - ${entry.score}`;
+    list.appendChild(item);
+  });
+}
