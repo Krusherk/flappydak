@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   const connectButton = document.getElementById("connectWalletBtn");
   const walletDisplay = document.getElementById("walletAddressDisplay");
-
+const payButton = document.querySelector(".start-btn");
+if (payButton) payButton.disabled = false;
   let signer;
 
   if (!connectButton) {
