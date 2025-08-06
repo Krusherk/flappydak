@@ -20,8 +20,15 @@
     <span class="score_val"></span>
   </div>
 <div class="leaderboard">
-  <h2>🏆 Leaderboard</h2>
-  <ul id="leaderboardList"></ul>
+  <div class="leaderboard-header">
+    <h2>LEADERBOARD</h2>
+    <p class="subtext">Only top players are displayed</p>
+    <div class="leaderboard-toggle">
+      <button class="toggle-btn active" id="highScoreBtn">High Score</button>
+      <button class="toggle-btn" id="maxDistanceBtn">Max Distance</button>
+    </div>
+  </div>
+  <ul id="leaderboardList" class="leaderboard-list"></ul>
 </div>
   <footer>made by crack</footer>
 </body>
