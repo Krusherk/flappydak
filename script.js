@@ -177,14 +177,25 @@ function submitScore() {
   if (existing) {
     if (finalScore > existing.score) {
       existing.score = finalScore;
+      existing.timestamp = Date.now(); // update time
     }
   } else {
-    leaderboard.push({ address, score: finalScore });
+    leaderboard.push({ address, score: finalScore, timestamp: Date.now() });
   }
 
   leaderboard.sort((a, b) => b.score - a.score);
-
   localStorage.setItem("flappy_leaderboard", JSON.stringify(leaderboard));
+}
+
+function formatTimeAgo(timestamp) {
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
 }
 
 function fetchLeaderboard() {
@@ -196,9 +207,20 @@ function fetchLeaderboard() {
   list.innerHTML = "";
 
   leaderboard.forEach((entry, index) => {
-    const item = document.createElement("li");
+    const li = document.createElement("li");
+    const rank =
+      index === 0 ? "🥇" :
+      index === 1 ? "🥈" :
+      index === 2 ? "🥉" :
+      `${index + 1}.`;
     const shortAddr = entry.address.slice(0, 6) + "..." + entry.address.slice(-4);
-    item.textContent = `${index + 1}. ${shortAddr} - ${entry.score}`;
-    list.appendChild(item);
+    const timeAgo = entry.timestamp ? formatTimeAgo(entry.timestamp) : "";
+    li.classList.add(`top-${index + 1}`);
+    li.innerHTML = `
+      <span class="leaderboard-player">${rank} ${shortAddr}</span>
+      <span class="leaderboard-score">${entry.score}</span>
+      <span class="timestamp">${timeAgo}</span>
+    `;
+    list.appendChild(li);
   });
 }
