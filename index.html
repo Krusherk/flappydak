@@ -6,7 +6,7 @@
   <title>Flappy Dak - Home</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  
+
   <!-- ✅ Wallet & Login -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
   <script src="https://auth.privy.io/v1/script.js"></script>
@@ -42,7 +42,7 @@
       text-shadow: 2px 2px black;
     }
 
-    .start-btn, #loginBtn {
+    .start-btn, #loginBtn, #logoutBtn {
       padding: 10px 20px;
       font-size: 14px;
       border: 2px solid white;
@@ -54,6 +54,12 @@
     .start-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    #walletAddress {
+      font-size: 10px;
+      margin-top: 10px;
+      color: #ccc;
     }
 
     footer {
@@ -71,8 +77,10 @@
   <div class="home-container">
     <h1>Welcome to Flappy Dak</h1>
 
-    <!-- 🔐 Login with Wallet -->
+    <!-- 🔐 Login / Logout -->
     <button id="loginBtn">Login with Wallet</button>
+    <button id="logoutBtn" style="display:none;">Logout</button>
+    <div id="walletAddress"></div>
 
     <!-- 💸 Pay and Play -->
     <button class="start-btn" id="payToPlayBtn" disabled>Pay 1 MON to Play</button>
@@ -95,27 +103,46 @@
 
     let signer;
 
-    // ✅ Initialize Privy
     Privy.init({ appId: PRIVY_APP_ID });
 
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const payBtn = document.getElementById("payToPlayBtn");
+    const walletAddressDisplay = document.getElementById("walletAddress");
+
     // 🔐 Login
-    document.getElementById("loginBtn").addEventListener("click", async () => {
+    loginBtn.addEventListener("click", async () => {
       try {
         const user = await Privy.login();
         const wallet = user.wallet.address;
         localStorage.setItem("flappy_wallet", wallet);
-        console.log("✅ Logged in with:", wallet);
 
-        // Enable play button
-        document.getElementById("payToPlayBtn").disabled = false;
+        walletAddressDisplay.innerText = `Connected: ${wallet}`;
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+        payBtn.disabled = false;
       } catch (err) {
         console.error("❌ Login failed:", err);
         alert("Login failed. Please try again.");
       }
     });
 
+    // 🚪 Logout
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await Privy.logout();
+        localStorage.removeItem("flappy_wallet");
+        walletAddressDisplay.innerText = "";
+        loginBtn.style.display = "inline-block";
+        logoutBtn.style.display = "none";
+        payBtn.disabled = true;
+      } catch (err) {
+        console.error("❌ Logout error:", err);
+      }
+    });
+
     // 💸 Pay to Play
-    document.getElementById("payToPlayBtn").addEventListener("click", async () => {
+    payBtn.addEventListener("click", async () => {
       try {
         if (!window.ethereum) {
           alert("Please install MetaMask");
@@ -124,18 +151,16 @@
 
         const provider = new ethers.BrowserProvider(window.ethereum);
         signer = await provider.getSigner();
-
         const contract = new ethers.Contract(contractAddress, abi, signer);
 
         const tx = await contract.playAndPay({
-          value: ethers.parseEther("1.0"),
+          value: ethers.parseEther("1.0")
         });
         await tx.wait();
 
         localStorage.setItem("flappy_paid", "yes");
         alert("✅ Payment successful! Launching game...");
         window.location.href = "game.html";
-
       } catch (err) {
         console.error("❌ Payment error:", err);
         alert("Payment failed. Please try again.");
