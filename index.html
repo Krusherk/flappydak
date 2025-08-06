@@ -114,9 +114,10 @@
     loginBtn.addEventListener("click", async () => {
       try {
         const user = await Privy.login();
-        const wallet = user.wallet.address;
-        localStorage.setItem("flappy_wallet", wallet);
+        const wallet = user?.wallet?.address;
+        if (!wallet) throw new Error("No wallet returned");
 
+        localStorage.setItem("flappy_wallet", wallet);
         walletAddressDisplay.innerText = `Connected: ${wallet}`;
         loginBtn.style.display = "none";
         logoutBtn.style.display = "inline-block";
