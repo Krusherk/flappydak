@@ -203,3 +203,7 @@ function fetchLeaderboard() {
     })
     .catch(err => console.error("Failed to fetch leaderboard:", err));
 }
+// Already defined fetchLeaderboard() above...
+
+// ✅ Call leaderboard fetch on page load
+fetchLeaderboard();

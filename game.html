@@ -8,32 +8,98 @@
   <title>Flappy Dak Game</title>
   <link rel="stylesheet" href="style.css">
 
-<script>
-  // Check if user paid and has remaining plays
-  if (!localStorage.getItem("flappy_paid")) {
-    alert("❌ You must pay to play!");
-    window.location.href = "index.html";
-  }
-
-  const plays = parseInt(localStorage.getItem("flappy_plays") || "0");
-
-  if (plays <= 0) {
-    alert("❌ You have no plays left. Please pay again.");
-    window.location.href = "index.html";
-  } else {
-    const remaining = plays - 1;
-    localStorage.setItem("flappy_plays", remaining.toString());
-
-    if (remaining === 0) {
-      setTimeout(() => {
-        alert("You've used your last play. Redirecting to homepage...");
-        window.location.href = "index.html";
-      }, 8000); // delay = 8 seconds
+  <script>
+    // Check if user paid and has remaining plays
+    if (!localStorage.getItem("flappy_paid")) {
+      alert("❌ You must pay to play!");
+      window.location.href = "index.html";
     }
-  }
-</script>
 
-  <!-- Your original script still loads -->
+    const plays = parseInt(localStorage.getItem("flappy_plays") || "0");
+
+    if (plays <= 0) {
+      alert("❌ You have no plays left. Please pay again.");
+      window.location.href = "index.html";
+    } else {
+      const remaining = plays - 1;
+      localStorage.setItem("flappy_plays", remaining.toString());
+
+      if (remaining === 0) {
+        setTimeout(() => {
+          alert("You've used your last play. Redirecting to homepage...");
+          window.location.href = "index.html";
+        }, 8000); // delay = 8 seconds
+      }
+    }
+  </script>
+
+  <!-- Firebase Leaderboard Integration -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push, set, query, orderByChild, limitToLast, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBJC8jBpf4RJcrjAhgYumUmYzlOxma-ojk",
+      authDomain: "flappydak.firebaseapp.com",
+      databaseURL: "https://flappydak-default-rtdb.firebaseio.com",
+      projectId: "flappydak",
+      storageBucket: "flappydak.firebasestorage.app",
+      messagingSenderId: "189314171470",
+      appId: "1:189314171470:web:4c3a9068fdb909b147791f",
+      measurementId: "G-R0LF3F59W9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Save score to Firebase
+    window.saveScoreToFirebase = function(score) {
+      const wallet = localStorage.getItem("flappy_wallet") || "anon";
+      const scoresRef = ref(db, "scores");
+      const newScoreRef = push(scoresRef);
+      set(newScoreRef, {
+        wallet,
+        score,
+        timestamp: Date.now()
+      });
+    };
+
+    // Load leaderboard from Firebase
+    window.loadLeaderboard = function () {
+      const leaderboardList = document.getElementById("leaderboardList");
+      leaderboardList.innerHTML = "<li>Loading...</li>";
+
+      const scoresRef = ref(db, "scores");
+      const topScoresQuery = query(scoresRef, orderByChild("score"), limitToLast(10));
+
+      onValue(topScoresQuery, (snapshot) => {
+        const scores = [];
+        snapshot.forEach((child) => {
+          scores.push(child.val());
+        });
+
+        // Sort highest first
+        scores.reverse();
+
+        leaderboardList.innerHTML = "";
+        scores.forEach((entry, index) => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <strong>#${index + 1}</strong>
+            ${entry.wallet.slice(0, 6)}...${entry.wallet.slice(-4)} - ${entry.score}
+          `;
+          leaderboardList.appendChild(li);
+        });
+      });
+    };
+
+    // Load leaderboard on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      loadLeaderboard();
+    });
+  </script>
+
+  <!-- Your original game logic -->
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -64,3 +130,4 @@
   <footer>made by crack</footer>
 </body>
 </html>
+
