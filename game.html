@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
+
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -75,40 +78,61 @@
     });
   </script>
 
-  <script>
-    // Only run this once on page load
-    document.addEventListener("DOMContentLoaded", () => {
-  const paid = localStorage.getItem("flappy_paid");
-  let plays = parseInt(localStorage.getItem("flappy_plays") || "0");
-
-  if (!paid) {
-    alert("❌ You must pay to play!");
-    window.location.href = "index.html";
-    return;
-  }
-
-  if (plays <= 0) {
-    alert("❌ You have no plays left. Please pay again.");
-    localStorage.removeItem("flappy_paid");
-    localStorage.removeItem("flappy_plays");
-    window.location.href = "index.html";
-    return;
-  }
-
-  // Deduct one play
-  plays -= 1;
-  localStorage.setItem("flappy_plays", plays.toString());
-
-  if (plays === 0) {
-    setTimeout(() => {
-      alert("You've used your last play. Redirecting to homepage...");
-      localStorage.removeItem("flappy_paid");
-      localStorage.removeItem("flappy_plays");
+ <script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const wallet = localStorage.getItem("flappy_wallet");
+    if (!wallet) {
+      alert("❌ You must login first.");
       window.location.href = "index.html";
-    }, 8000); // after 8 seconds
-  }
-});
-  </script>
+      return;
+    }
+
+    // Contract details
+    const contractAddress = "0x5d114a14f98086c14E9fC4B85092a5C30d69419b";
+    const abi = [
+      {
+        "inputs": [{ "internalType": "address", "name": "player", "type": "address" }],
+        "name": "remainingPlays",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ];
+
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const contract = new ethers.Contract(contractAddress, abi, provider);
+
+      const plays = await contract.remainingPlays(wallet);
+
+      if (plays <= 0) {
+        alert("❌ You have no plays left. Please pay again.");
+        localStorage.removeItem("flappy_paid");
+        localStorage.removeItem("flappy_plays");
+        window.location.href = "index.html";
+        return;
+      }
+
+      // Store updated local plays
+      localStorage.setItem("flappy_plays", plays - 1);
+      localStorage.setItem("flappy_paid", "true");
+
+      // Optionally: Notify when using final play
+      if (plays - 1 === 0) {
+        setTimeout(() => {
+          alert("You've used your last play. Redirecting to homepage...");
+          localStorage.removeItem("flappy_paid");
+          localStorage.removeItem("flappy_plays");
+          window.location.href = "index.html";
+        }, 8000);
+      }
+    } catch (err) {
+      console.error("Error checking plays:", err);
+      alert("Failed to verify plays. Try logging in again.");
+      window.location.href = "index.html";
+    }
+  });
+</script>
 
   <script src="script.js" defer></script>
 </head>
