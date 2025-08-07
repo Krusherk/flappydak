@@ -149,7 +149,7 @@
           value: ethers.parseEther("0.2")     // ✅ changed from 1.0 to 0.2
         });
         await tx.wait();
-
+localStorage.setItem("flappy_paid", "true");  // ✅ THIS IS MISSING
         localStorage.setItem("flappy_plays", "3"); // ✅ added: store 3 plays
         alert("✅ Payment successful! You now have 3 plays.");
         window.location.href = "game.html";

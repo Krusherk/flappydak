@@ -78,37 +78,36 @@
   <script>
     // Only run this once on page load
     document.addEventListener("DOMContentLoaded", () => {
-      const paid = localStorage.getItem("flappy_paid");
-      let plays = parseInt(localStorage.getItem("flappy_plays") || "0");
+  const paid = localStorage.getItem("flappy_paid");
+  let plays = parseInt(localStorage.getItem("flappy_plays") || "0");
 
-      if (!paid) {
-        alert("❌ You must pay to play!");
-        window.location.href = "index.html";
-        return;
-      }
+  if (!paid) {
+    alert("❌ You must pay to play!");
+    window.location.href = "index.html";
+    return;
+  }
 
-      if (plays <= 0) {
-        alert("❌ You have no plays left. Please pay again.");
-        localStorage.removeItem("flappy_paid");
-        localStorage.removeItem("flappy_plays");
-        window.location.href = "index.html";
-        return;
-      }
+  if (plays <= 0) {
+    alert("❌ You have no plays left. Please pay again.");
+    localStorage.removeItem("flappy_paid");
+    localStorage.removeItem("flappy_plays");
+    window.location.href = "index.html";
+    return;
+  }
 
-      // Decrement play count
-      plays -= 1;
-      localStorage.setItem("flappy_plays", plays.toString());
+  // Deduct one play
+  plays -= 1;
+  localStorage.setItem("flappy_plays", plays.toString());
 
-      // Show redirect warning if this is last play
-      if (plays === 0) {
-        setTimeout(() => {
-          alert("You've used your last play. Redirecting to homepage...");
-          localStorage.removeItem("flappy_paid");
-          localStorage.removeItem("flappy_plays");
-          window.location.href = "index.html";
-        }, 8000); // 8 seconds delay after game starts
-      }
-    });
+  if (plays === 0) {
+    setTimeout(() => {
+      alert("You've used your last play. Redirecting to homepage...");
+      localStorage.removeItem("flappy_paid");
+      localStorage.removeItem("flappy_plays");
+      window.location.href = "index.html";
+    }, 8000); // after 8 seconds
+  }
+});
   </script>
 
   <script src="script.js" defer></script>
