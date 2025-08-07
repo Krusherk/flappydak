@@ -131,6 +131,7 @@ html, body {
 * {
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
+}  /* ← THIS FIXES THE ERROR */
 
 .leaderboard {
   position: fixed;
@@ -231,4 +232,34 @@ html, body {
   font-size: 6px;
   color: #aaa;
   margin-left: 4px;
+}
+#loginBtn,
+#logoutBtn,
+.start-btn {
+  padding: 12px 24px;
+  font-size: 12px;
+  font-family: 'Press Start 2P', monospace;
+  background: linear-gradient(135deg, #7e30e1, #b983ff);
+  border: 2px solid #e0b3ff;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(126, 48, 225, 0.4);
+}
+
+#loginBtn:hover,
+#logoutBtn:hover,
+.start-btn:hover {
+  background: linear-gradient(135deg, #9a42f3, #d1a3ff);
+  box-shadow: 0 6px 20px rgba(126, 48, 225, 0.6);
+  transform: scale(1.05);
+}
+
+.start-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #444;
+  border: 2px solid #999;
+  box-shadow: none;
 }
