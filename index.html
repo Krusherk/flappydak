@@ -130,9 +130,8 @@
         logoutBtn.style.display = "inline-block";
         payBtn.disabled = false;
       } catch (err) {
-        console.error("❌ Login failed:", err);
-        alert("Login failed. Please try again.");
-      }
+  alert("Payment failed. Please try again.");
+}
     });
 
     logoutBtn.addEventListener("click", () => {
