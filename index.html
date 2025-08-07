@@ -4,16 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Flappy Dak - Home</title>
+  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
+
   <style>
     body {
       margin: 0;
-      background: #000 url('images/dakdak.png') center/cover no-repeat;
+      background-image: url('images/dakdak.png');
+      background-size: cover;
+      background-position: center;
       font-family: 'Press Start 2P', cursive;
       color: white;
       text-align: center;
     }
+
+    body, h1, .start-btn, footer {
+      -webkit-font-smoothing: none;
+      -moz-osx-font-smoothing: grayscale;
+      font-smooth: never;
+    }
+
     .home-container {
       height: 100vh;
       display: flex;
@@ -22,7 +33,13 @@
       align-items: center;
       gap: 20px;
     }
-    button {
+
+    h1 {
+      font-size: 22px;
+      text-shadow: 2px 2px black;
+    }
+
+    .start-btn, #loginBtn, #logoutBtn {
       padding: 10px 20px;
       font-size: 14px;
       border: 2px solid white;
@@ -30,61 +47,108 @@
       color: white;
       cursor: pointer;
     }
+
+    .start-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     #walletAddress {
-      font-size: 12px;
+      font-size: 10px;
       margin-top: 10px;
+      color: #ccc;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      font-family: sans-serif;
+      color: white;
     }
   </style>
 </head>
+
 <body>
   <div class="home-container">
     <h1>Welcome to Flappy Dak</h1>
-    <button id="connectBtn">Connect MetaMask</button>
+
+    <!-- 🔐 Login / Logout -->
+    <button id="loginBtn">Login with MetaMask</button>
+    <button id="logoutBtn" style="display:none;">Logout</button>
     <div id="walletAddress"></div>
-    <button id="playBtn" disabled>Pay 1 MON to Play</button>
+
+    <!-- 💸 Pay and Play -->
+    <button class="start-btn" id="payToPlayBtn" disabled>Pay 1 MON to Play</button>
   </div>
 
+  <footer>made by crack</footer>
+
   <script>
-    const connectBtn = document.getElementById("connectBtn");
-    const playBtn = document.getElementById("playBtn");
-    const walletAddressDisplay = document.getElementById("walletAddress");
+    const contractAddress = "0xb2EFbbC0cFC1898D7d2615856904d3f9785B7D29";
+    const abi = [
+      {
+        "inputs": [],
+        "name": "playAndPay",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      }
+    ];
 
     let signer;
+    let provider;
 
-    const contractAddress = "0xb2EFbbC0cFC1898D7d2615856904d3f9785B7D29";
-    const abi = [{
-      "inputs": [],
-      "name": "playAndPay",
-      "outputs": [],
-      "stateMutability": "payable",
-      "type": "function"
-    }];
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const payBtn = document.getElementById("payToPlayBtn");
+    const walletAddressDisplay = document.getElementById("walletAddress");
 
-    connectBtn.addEventListener("click", async () => {
-      if (!window.ethereum) {
-        alert("Please install MetaMask!");
-        return;
+    loginBtn.addEventListener("click", async () => {
+      try {
+        if (!window.ethereum) {
+          alert("Please install MetaMask");
+          return;
+        }
+
+        provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        signer = await provider.getSigner();
+
+        const wallet = accounts[0];
+        localStorage.setItem("flappy_wallet", wallet);
+        walletAddressDisplay.innerText = `Connected: ${wallet}`;
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+        payBtn.disabled = false;
+      } catch (err) {
+        console.error("❌ Login failed:", err);
+        alert("Login failed. Please try again.");
       }
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      signer = await provider.getSigner();
-      const address = await signer.getAddress();
-      walletAddressDisplay.innerText = `Connected: ${address}`;
-      playBtn.disabled = false;
     });
 
-    playBtn.addEventListener("click", async () => {
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("flappy_wallet");
+      walletAddressDisplay.innerText = "";
+      loginBtn.style.display = "inline-block";
+      logoutBtn.style.display = "none";
+      payBtn.disabled = true;
+    });
+
+    payBtn.addEventListener("click", async () => {
       try {
         const contract = new ethers.Contract(contractAddress, abi, signer);
         const tx = await contract.playAndPay({
           value: ethers.parseEther("1.0")
         });
         await tx.wait();
+
+        localStorage.setItem("flappy_paid", "yes");
         alert("✅ Payment successful! Launching game...");
         window.location.href = "game.html";
       } catch (err) {
-        console.error("Payment error:", err);
+        console.error("❌ Payment error:", err);
         alert("Payment failed. Please try again.");
       }
     });
