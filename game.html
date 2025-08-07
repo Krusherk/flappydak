@@ -8,14 +8,30 @@
   <title>Flappy Dak Game</title>
   <link rel="stylesheet" href="style.css">
 
-  <!-- ✅ Add payment check early -->
-  <script>
-    // Block unpaid users from loading the game
-    if (!localStorage.getItem("flappy_paid")) {
-      alert("❌ You must pay to play!");
-      window.location.href = "index.html";
+<script>
+  // Check if user paid and has remaining plays
+  if (!localStorage.getItem("flappy_paid")) {
+    alert("❌ You must pay to play!");
+    window.location.href = "index.html";
+  }
+
+  const plays = parseInt(localStorage.getItem("flappy_plays") || "0");
+
+  if (plays <= 0) {
+    alert("❌ You have no plays left. Please pay again.");
+    window.location.href = "index.html";
+  } else {
+    const remaining = plays - 1;
+    localStorage.setItem("flappy_plays", remaining.toString());
+
+    if (remaining === 0) {
+      setTimeout(() => {
+        alert("You've used your last play. Redirecting to homepage...");
+        window.location.href = "index.html";
+      }, 8000); // delay = 8 seconds
     }
-  </script>
+  }
+</script>
 
   <!-- Your original script still loads -->
   <script src="script.js" defer></script>

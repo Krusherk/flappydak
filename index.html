@@ -80,19 +80,26 @@
     <div id="walletAddress"></div>
 
     <!-- 💸 Pay and Play -->
-    <button class="start-btn" id="payToPlayBtn" disabled>Pay 1 MON to Play</button>
+    <button class="start-btn" id="payToPlayBtn" disabled>Pay 0.2 MON to Get 3 Plays</button> <!-- ✅ changed -->
   </div>
 
   <footer>made by crack</footer>
 
   <script>
-    const contractAddress = "0xb2EFbbC0cFC1898D7d2615856904d3f9785B7D29";
-    const abi = [
+    const contractAddress = "0x5d114a14f98086c14E9fC4B85092a5C30d69419b";
+    const abi = [ // ✅ updated ABI
       {
         "inputs": [],
-        "name": "playAndPay",
+        "name": "payToPlay",
         "outputs": [],
         "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [{ "internalType": "address", "name": "player", "type": "address" }],
+        "name": "remainingPlays",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
         "type": "function"
       }
     ];
@@ -139,13 +146,13 @@
     payBtn.addEventListener("click", async () => {
       try {
         const contract = new ethers.Contract(contractAddress, abi, signer);
-        const tx = await contract.playAndPay({
-          value: ethers.parseEther("1.0")
+        const tx = await contract.payToPlay({ // ✅ changed
+          value: ethers.parseEther("0.2")     // ✅ changed from 1.0 to 0.2
         });
         await tx.wait();
 
-        localStorage.setItem("flappy_paid", "yes");
-        alert("✅ Payment successful! Launching game...");
+        localStorage.setItem("flappy_plays", "3"); // ✅ added: store 3 plays
+        alert("✅ Payment successful! You now have 3 plays.");
         window.location.href = "game.html";
       } catch (err) {
         console.error("❌ Payment error:", err);
