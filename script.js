@@ -1,4 +1,4 @@
-let move_speed = 3, grativy = 0.5;
+let move_speed = 3, gravity = 0.5;
 let bird = document.querySelector('.bird');
 let img = document.getElementById('bird-1');
 let sound_point = new Audio('sounds effect/point.mp3');
@@ -15,8 +15,8 @@ let game_state = 'Start';
 message.classList.add('messageStyle');
 
 document.addEventListener('keydown', (e) => {
-  if (e.key == 'Enter' && game_state != 'Play') {
-    document.querySelectorAll('.pipe_sprite').forEach((e) => e.remove());
+  if (e.key === 'Enter' && game_state !== 'Play') {
+    document.querySelectorAll('.pipe_sprite').forEach(e => e.remove());
     img.style.display = 'block';
     bird.style.top = '40vh';
     game_state = 'Play';
@@ -29,8 +29,8 @@ document.addEventListener('keydown', (e) => {
 });
 
 document.addEventListener('touchstart', () => {
-  if (game_state != 'Play') {
-    document.querySelectorAll('.pipe_sprite').forEach((e) => e.remove());
+  if (game_state !== 'Play') {
+    document.querySelectorAll('.pipe_sprite').forEach(e => e.remove());
     img.style.display = 'block';
     bird.style.top = '40vh';
     game_state = 'Play';
@@ -45,22 +45,20 @@ document.addEventListener('touchstart', () => {
 function submitScore() {
   const finalScore = parseInt(score_val.innerHTML, 10);
   const address = localStorage.getItem("flappy_wallet");
+  if (!address || finalScore <= 0) return;
 
-  if (address && finalScore > 0) {
-    fetch("/api/submit-score", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ address, score: finalScore }),
-    }).catch(err => console.error("Score submit failed:", err));
-  }
+  fetch("http://localhost:3000/api/submit-score", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ address, score: finalScore }),
+  }).catch(err => console.error("Score submit failed:", err));
 }
 
 function play() {
   function move() {
-    if (game_state != 'Play') return;
+    if (game_state !== 'Play') return;
 
-    let pipe_sprite = document.querySelectorAll('.pipe_sprite');
-    pipe_sprite.forEach((element) => {
+    document.querySelectorAll('.pipe_sprite').forEach((element) => {
       let pipe_sprite_props = element.getBoundingClientRect();
       bird_props = bird.getBoundingClientRect();
 
@@ -84,7 +82,7 @@ function play() {
           if (
             pipe_sprite_props.right < bird_props.left &&
             pipe_sprite_props.right + move_speed >= bird_props.left &&
-            element.increase_score == '1'
+            element.increase_score === '1'
           ) {
             score_val.innerHTML = +score_val.innerHTML + 1;
             sound_point.play();
@@ -98,34 +96,35 @@ function play() {
   requestAnimationFrame(move);
 
   let bird_dy = 0;
+
   function apply_gravity() {
-    if (game_state != 'Play') return;
-    bird_dy = bird_dy + grativy;
+    if (game_state !== 'Play') return;
+    bird_dy += gravity;
 
     document.addEventListener('keydown', (e) => {
-      if (e.key == 'ArrowUp' || e.key == ' ') {
+      if (e.key === 'ArrowUp' || e.key === ' ') {
         img.src = 'images/Bird-2.png';
         bird_dy = -7.6;
       }
     });
 
     document.addEventListener('touchstart', () => {
-      if (game_state == 'Play') {
+      if (game_state === 'Play') {
         img.src = 'images/Bird-2.png';
         bird_dy = -7.6;
       }
     });
 
-    document.addEventListener('gesturestart', function (e) {
-      e.preventDefault();
-    });
+    document.addEventListener('gesturestart', (e) => e.preventDefault());
 
     if (bird_props.top <= 0 || bird_props.bottom >= background.bottom) {
       game_state = 'End';
       submitScore();
       message.style.left = '28vw';
-      window.location.reload();
-      message.classList.remove('messageStyle');
+      message.innerHTML = 'Game Over'.fontcolor('red') + '<br>Press Enter To Restart';
+      message.classList.add('messageStyle');
+      img.style.display = 'none';
+      sound_die.play();
       return;
     }
 
@@ -135,56 +134,35 @@ function play() {
   }
   requestAnimationFrame(apply_gravity);
 
-  let pipe_seperation = 0;
-  let pipe_gap = 35;
+  let pipe_separation = 0;
+  const pipe_gap = 35;
 
   function create_pipe() {
-    if (game_state != 'Play') return;
+    if (game_state !== 'Play') return;
 
-    if (pipe_seperation > 115) {
-      pipe_seperation = 0;
+    if (pipe_separation > 115) {
+      pipe_separation = 0;
 
-      let pipe_posi = Math.floor(Math.random() * 43) + 8;
-      let pipe_sprite_inv = document.createElement('div');
+      const pipe_posi = Math.floor(Math.random() * 43) + 8;
+
+      const pipe_sprite_inv = document.createElement('div');
       pipe_sprite_inv.className = 'pipe_sprite';
       pipe_sprite_inv.style.top = pipe_posi - 70 + 'vh';
       pipe_sprite_inv.style.left = '100vw';
       document.body.appendChild(pipe_sprite_inv);
 
-      let pipe_sprite = document.createElement('div');
+      const pipe_sprite = document.createElement('div');
       pipe_sprite.className = 'pipe_sprite';
       pipe_sprite.style.top = pipe_posi + pipe_gap + 'vh';
       pipe_sprite.style.left = '100vw';
       pipe_sprite.increase_score = '1';
       document.body.appendChild(pipe_sprite);
     }
-    pipe_seperation++;
+
+    pipe_separation++;
     requestAnimationFrame(create_pipe);
   }
   requestAnimationFrame(create_pipe);
-}
-
-function submitScore() {
-  const finalScore = parseInt(score_val.innerHTML, 10);
-  const address = localStorage.getItem("flappy_wallet");
-  if (!address || finalScore <= 0) return;
-
-  fetch("http://localhost:3000/api/submit-score", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ address, score: finalScore }),
-  }).catch(err => console.error("Score submit failed:", err));
-}
-
-function formatTimeAgo(timestamp) {
-  const seconds = Math.floor((Date.now() - timestamp) / 1000);
-  if (seconds < 60) return `${seconds}s ago`;
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
 }
 
 function fetchLeaderboard() {
@@ -203,7 +181,5 @@ function fetchLeaderboard() {
     })
     .catch(err => console.error("Failed to fetch leaderboard:", err));
 }
-// Already defined fetchLeaderboard() above...
 
-// ✅ Call leaderboard fetch on page load
 fetchLeaderboard();
