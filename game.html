@@ -8,23 +8,6 @@
   <title>Flappy Dak Game</title>
   <link rel="stylesheet" href="style.css">
 
-  <script>
-  const paid = localStorage.getItem("flappy_paid") === "true";
-  let plays = parseInt(localStorage.getItem("flappy_plays") || "0");
-
-  if (!paid || plays <= 0) {
-    alert("❌ You must pay 0.2 MON to play!");
-    window.location.href = "index.html";
-  } else {
-    plays--;
-    localStorage.setItem("flappy_plays", plays);
-
-    if (plays <= 0) {
-      localStorage.removeItem("flappy_paid");
-    }
-  }
-</script>
-
   <!-- Firebase Leaderboard Integration -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
