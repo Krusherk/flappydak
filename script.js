@@ -50,6 +50,20 @@ function endGame() {
   sound_die.play();
   submitScore();
 }
+function endGame() {
+  // ... your existing game over logic ...
+
+  // Deduct a play on every game end
+  let plays = parseInt(localStorage.getItem("flappy_plays") || "0");
+  plays = Math.max(plays - 1, 0);
+  localStorage.setItem("flappy_plays", plays);
+
+  if (plays <= 0) {
+    localStorage.removeItem("flappy_paid");
+    alert("❌ No plays left. Please pay 0.2 MON to continue.");
+    window.location.href = "index.html";
+  }
+}
 
 document.addEventListener('keydown', (e) => {
   if (e.key == 'Enter' && game_state !== 'Play') {
