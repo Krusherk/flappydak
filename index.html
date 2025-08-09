@@ -85,64 +85,65 @@
 
   <footer>made by crack</footer>
 
-  <script>
-    const contractAddress = "0x5d114a14f98086c14E9fC4B85092a5C30d69419b";
-    const abi = [ // ✅ updated ABI
-      {
-        "inputs": [],
-        "name": "payToPlay",
-        "outputs": [],
-        "stateMutability": "payable",
-        "type": "function"
-      },
-      {
-        "inputs": [{ "internalType": "address", "name": "player", "type": "address" }],
-        "name": "remainingPlays",
-        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-        "stateMutability": "view",
-        "type": "function"
-      }
-    ];
+<script>
+const contractAddress = "0x5d114a14f98086c14E9fC4B85092a5C30d69419b";
+const abi = [
+  {
+    "inputs": [],
+    "name": "payToPlay",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "player", "type": "address" }],
+    "name": "remainingPlays",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
 
-    let signer;
-    let provider;
+let signer;
+let provider;
 
-    const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const payBtn = document.getElementById("payToPlayBtn");
-    const walletAddressDisplay = document.getElementById("walletAddress");
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const payBtn = document.getElementById("payToPlayBtn");
+const walletAddressDisplay = document.getElementById("walletAddress");
 
-    loginBtn.addEventListener("click", async () => {
-      try {
-        if (!window.ethereum) {
-          alert("Please install MetaMask");
-          return;
-        }
+loginBtn.addEventListener("click", async () => {
+  try {
+    if (!window.ethereum) {
+      alert("Please install MetaMask");
+      return;
+    }
 
-        provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        signer = await provider.getSigner();
+    provider = new ethers.BrowserProvider(window.ethereum);
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    signer = await provider.getSigner();
 
-        const wallet = accounts[0];
-        localStorage.setItem("flappy_wallet", wallet);
-        walletAddressDisplay.innerText = Connected: ${wallet};
-        loginBtn.style.display = "none";
-        logoutBtn.style.display = "inline-block";
-        payBtn.disabled = false;
-      } catch (err) {
-  alert("Payment failed. Please try again.");
-}
-    });
+    const wallet = accounts[0];
+    localStorage.setItem("flappy_wallet", wallet);
+    walletAddressDisplay.innerText = `Connected: ${wallet}`;
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "inline-block";
+    payBtn.disabled = false;
+  } catch (err) {
+    console.error("Login failed:", err);
+    alert("Login failed. Please try again.");
+  }
+});
 
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("flappy_wallet");
-      walletAddressDisplay.innerText = "";
-      loginBtn.style.display = "inline-block";
-      logoutBtn.style.display = "none";
-      payBtn.disabled = true;
-    });
+logoutBtn.addEventListener("click", () => {
+  localStorage.removeItem("flappy_wallet");
+  walletAddressDisplay.innerText = "";
+  loginBtn.style.display = "inline-block";
+  logoutBtn.style.display = "none";
+  payBtn.disabled = true;
+});
 
- payBtn.addEventListener("click", async () => {
+payBtn.addEventListener("click", async () => {
   try {
     const contract = new ethers.Contract(contractAddress, abi, signer);
     const tx = await contract.payToPlay({
@@ -151,7 +152,7 @@
     await tx.wait();
 
     localStorage.setItem("flappy_plays", "3");
-    localStorage.setItem("flappy_paid", "true"); // ✅ SET THIS
+    localStorage.setItem("flappy_paid", "true");
     alert("✅ Payment successful! You now have 3 plays.");
     window.location.href = "game.html";
   } catch (err) {
@@ -159,7 +160,4 @@
     alert("Payment failed. Please try again.");
   }
 });
-
-  </script>
-</body>
-</html>
+</script>
