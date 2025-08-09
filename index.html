@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
 
   <style>
     body {
@@ -39,7 +41,7 @@
       text-shadow: 2px 2px black;
     }
 
-    .start-btn, #loginBtn, #logoutBtn {
+    .start-btn, #loginBtn, #logoutBtn, #saveDiscordBtn {
       padding: 10px 20px;
       font-size: 14px;
       border: 2px solid white;
@@ -67,6 +69,23 @@
       font-family: sans-serif;
       color: white;
     }
+
+    #discordSection {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    #discordUsername {
+      padding: 8px;
+      font-size: 12px;
+      border: 2px solid white;
+      background: black;
+      color: white;
+      width: 200px;
+      text-align: center;
+    }
   </style>
 </head>
 
@@ -79,15 +98,35 @@
     <button id="logoutBtn" style="display:none;">Logout</button>
     <div id="walletAddress"></div>
 
+    <!-- 🎮 Discord Link -->
+    <div id="discordSection">
+      <input type="text" id="discordUsername" placeholder="Enter Discord username">
+      <button id="saveDiscordBtn">Save Discord</button>
+    </div>
+
     <!-- 💸 Pay and Play -->
-    <button class="start-btn" id="payToPlayBtn" disabled>Pay 0.2 MON to Get 3 Plays</button> <!-- ✅ changed -->
+    <button class="start-btn" id="payToPlayBtn" disabled>Pay 0.2 MON to Get 3 Plays</button>
   </div>
 
   <footer>made by crack</footer>
 
   <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBJC8jBpf4RJcrjAhgYumUmYzlOxma-ojk",
+      authDomain: "flappydak.firebaseapp.com",
+      databaseURL: "https://flappydak-default-rtdb.firebaseio.com",
+      projectId: "flappydak",
+      storageBucket: "flappydak.firebasestorage.app",
+      messagingSenderId: "189314171470",
+      appId: "1:189314171470:web:4c3a9068fdb909b147791f",
+      measurementId: "G-R0LF3F59W9"
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     const contractAddress = "0x5d114a14f98086c14E9fC4B85092a5C30d69419b";
-    const abi = [ // ✅ updated ABI
+    const abi = [
       {
         "inputs": [],
         "name": "payToPlay",
@@ -111,6 +150,9 @@
     const logoutBtn = document.getElementById("logoutBtn");
     const payBtn = document.getElementById("payToPlayBtn");
     const walletAddressDisplay = document.getElementById("walletAddress");
+    const discordSection = document.getElementById("discordSection");
+    const saveDiscordBtn = document.getElementById("saveDiscordBtn");
+    const discordUsernameInput = document.getElementById("discordUsername");
 
     loginBtn.addEventListener("click", async () => {
       try {
@@ -129,9 +171,12 @@
         loginBtn.style.display = "none";
         logoutBtn.style.display = "inline-block";
         payBtn.disabled = false;
+
+        // Show Discord input
+        discordSection.style.display = "flex";
       } catch (err) {
-  alert("Payment failed. Please try again.");
-}
+        alert("Login failed. Please try again.");
+      }
     });
 
     logoutBtn.addEventListener("click", () => {
@@ -140,26 +185,49 @@
       loginBtn.style.display = "inline-block";
       logoutBtn.style.display = "none";
       payBtn.disabled = true;
+      discordSection.style.display = "none";
     });
 
- payBtn.addEventListener("click", async () => {
-  try {
-    const contract = new ethers.Contract(contractAddress, abi, signer);
-    const tx = await contract.payToPlay({
-      value: ethers.parseEther("0.2")
+    saveDiscordBtn.addEventListener("click", () => {
+      const wallet = localStorage.getItem("flappy_wallet");
+      const discord = discordUsernameInput.value.trim();
+      if (!wallet) {
+        alert("Please connect your wallet first.");
+        return;
+      }
+      if (!discord) {
+        alert("Please enter a Discord username.");
+        return;
+      }
+
+      firebase.database().ref("users/" + wallet).set({
+        wallet: wallet,
+        discord: discord
+      }).then(() => {
+        alert("✅ Discord username saved!");
+      }).catch(err => {
+        console.error(err);
+        alert("❌ Failed to save Discord username.");
+      });
     });
-    await tx.wait();
 
-    localStorage.setItem("flappy_plays", "3");
-    localStorage.setItem("flappy_paid", "true"); // ✅ SET THIS
-    alert("✅ Payment successful! You now have 3 plays.");
-    window.location.href = "game.html";
-  } catch (err) {
-    console.error("❌ Payment error:", err);
-    alert("Payment failed. Please try again.");
-  }
-});
+    payBtn.addEventListener("click", async () => {
+      try {
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+        const tx = await contract.payToPlay({
+          value: ethers.parseEther("0.2")
+        });
+        await tx.wait();
 
+        localStorage.setItem("flappy_plays", "3");
+        localStorage.setItem("flappy_paid", "true");
+        alert("✅ Payment successful! You now have 3 plays.");
+        window.location.href = "game.html";
+      } catch (err) {
+        console.error("❌ Payment error:", err);
+        alert("Payment failed. Please try again.");
+      }
+    });
   </script>
 </body>
 </html>
