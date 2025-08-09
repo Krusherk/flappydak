@@ -7,8 +7,6 @@
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 
   <style>
     body {
@@ -21,13 +19,19 @@
       text-align: center;
     }
 
+    body, h1, .start-btn, footer {
+      -webkit-font-smoothing: none;
+      -moz-osx-font-smoothing: grayscale;
+      font-smooth: never;
+    }
+
     .home-container {
       height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: 20px;
+      gap: 12px;
     }
 
     h1 {
@@ -35,32 +39,46 @@
       text-shadow: 2px 2px black;
     }
 
-    /* Button styling */
-    .btn {
+    /* keep button look consistent */
+    .start-btn, #loginBtn, #logoutBtn, #submitDiscordBtn {
       padding: 10px 20px;
       font-size: 14px;
       border: 2px solid white;
       background: black;
       color: white;
       cursor: pointer;
-      transition: 0.3s ease;
+      border-radius: 8px;
     }
 
-    .btn:hover {
-      background: linear-gradient(135deg, #9a42f3, #d1a3ff);
-      box-shadow: 0 6px 20px rgba(126, 48, 225, 0.6);
-      transform: scale(1.05);
-    }
-
-    .btn:disabled {
+    .start-btn:disabled, #submitDiscordBtn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      background: #222;
     }
 
     #walletAddress {
       font-size: 10px;
-      margin-top: 10px;
+      margin-top: 6px;
       color: #ccc;
+      word-break: break-all;
+    }
+
+    .discord-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .discord-row input {
+      padding: 8px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 12px;
+      border-radius: 6px;
+      border: 2px solid #e0e0e0;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      width: 220px;
     }
 
     footer {
@@ -71,140 +89,225 @@
       font-family: sans-serif;
       color: white;
     }
-
-    input {
-      padding: 8px;
-      font-size: 14px;
-      border: 2px solid white;
-      background: black;
-      color: white;
-      text-align: center;
-    }
   </style>
 </head>
+
 <body>
   <div class="home-container">
     <h1>Welcome to Flappy Dak</h1>
 
-    <!-- Wallet login -->
-    <button id="loginBtn" class="btn">Login with MetaMask</button>
-    <button id="logoutBtn" class="btn" style="display:none;">Logout</button>
+    <!-- 🔐 Login / Logout -->
+    <button id="loginBtn">Login with MetaMask</button>
+    <button id="logoutBtn" style="display:none;">Logout</button>
     <div id="walletAddress"></div>
 
-    <!-- Discord username -->
-    <div id="discordSection" style="display:none;">
-      <input type="text" id="discordInput" placeholder="Enter Discord username" />
-      <button id="saveDiscordBtn" class="btn">Save Discord</button>
+    <!-- Discord username (auto-saves to wallet) -->
+    <div class="discord-row" id="discordRow" style="display:none;">
+      <input id="discordInput" placeholder="Discord#1234" />
+      <button id="submitDiscordBtn">Save Discord</button>
     </div>
 
-    <!-- Pay button -->
-    <button class="btn" id="payToPlayBtn" disabled>Pay 0.2 MON to Get 3 Plays</button>
+    <!-- 💸 Pay and Play -->
+    <button class="start-btn" id="payToPlayBtn" disabled>Pay 0.2 MON to Get 3 Plays</button>
   </div>
 
   <footer>made by crack</footer>
 
-<script type="module">
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyBJC8jBpf4RJcrjAhgYumUmYzlOxma-ojk",
-    authDomain: "flappydak.firebaseapp.com",
-    databaseURL: "https://flappydak-default-rtdb.firebaseio.com",
-    projectId: "flappydak",
-    storageBucket: "flappydak.firebasestorage.app",
-    messagingSenderId: "189314171470",
-    appId: "1:189314171470:web:4c3a9068fdb909b147791f",
-    measurementId: "G-R0LF3F59W9"
-  };
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+  <!-- Firebase + MetaMask logic all in module -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  const contractAddress = "0x5d114a14f98086c14E9fC4B85092a5C30d69419b";
-  const abi = [
-    { "inputs": [], "name": "payToPlay", "outputs": [], "stateMutability": "payable", "type": "function" },
-    { "inputs": [{ "internalType": "address", "name": "player", "type": "address" }], "name": "remainingPlays", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }
-  ];
+    // ---------- FIREBASE CONFIG ----------
+    const firebaseConfig = {
+      apiKey: "AIzaSyBJC8jBpf4RJcrjAhgYumUmYzlOxma-ojk",
+      authDomain: "flappydak.firebaseapp.com",
+      databaseURL: "https://flappydak-default-rtdb.firebaseio.com",
+      projectId: "flappydak",
+      storageBucket: "flappydak.firebasestorage.app",
+      messagingSenderId: "189314171470",
+      appId: "1:189314171470:web:4c3a9068fdb909b147791f",
+      measurementId: "G-R0LF3F59W9"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-  let signer;
-  let provider;
-  let currentWallet = null;
+    // ---------- DOM ----------
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const walletAddressDisplay = document.getElementById("walletAddress");
+    const payBtn = document.getElementById("payToPlayBtn");
+    const discordRow = document.getElementById("discordRow");
+    const discordInput = document.getElementById("discordInput");
+    const submitDiscordBtn = document.getElementById("submitDiscordBtn");
 
-  const loginBtn = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const payBtn = document.getElementById("payToPlayBtn");
-  const walletAddressDisplay = document.getElementById("walletAddress");
-  const discordSection = document.getElementById("discordSection");
-  const discordInput = document.getElementById("discordInput");
-  const saveDiscordBtn = document.getElementById("saveDiscordBtn");
+    // ---------- ETHEREUM / Ethers ----------
+    let provider = null;
+    let signer = null;
+    let currentWallet = null;
 
-  // Wallet login
-  loginBtn.addEventListener("click", async () => {
-    if (!window.ethereum) {
-      alert("Please install MetaMask");
-      return;
+    // contract details (kept as you had)
+    const contractAddress = "0x5d114a14f98086c14E9fC4B85092a5C30d69419b";
+    const abi = [
+      { "inputs": [], "name": "payToPlay", "outputs": [], "stateMutability": "payable", "type": "function" },
+      { "inputs": [{ "internalType": "address", "name": "player", "type": "address" }], "name": "remainingPlays", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }
+    ];
+
+    // Read discord username for a wallet
+    async function getDiscordForWallet(wallet) {
+      if (!wallet) return null;
+      try {
+        const snap = await get(ref(db, `discordUsernames/${wallet}`));
+        return snap.exists() ? snap.val().username : null;
+      } catch (err) {
+        console.error("Firebase read error:", err);
+        return null;
+      }
     }
 
-    provider = new ethers.BrowserProvider(window.ethereum);
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    signer = await provider.getSigner();
-    currentWallet = accounts[0];
-    localStorage.setItem("flappy_wallet", currentWallet);
-    walletAddressDisplay.innerText = `Connected: ${currentWallet}`;
-
-    loginBtn.style.display = "none";
-    logoutBtn.style.display = "inline-block";
-    payBtn.disabled = false;
-
-    checkDiscord();
-  });
-
-  // Logout
-  logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem("flappy_wallet");
-    walletAddressDisplay.innerText = "";
-    loginBtn.style.display = "inline-block";
-    logoutBtn.style.display = "none";
-    payBtn.disabled = true;
-    discordSection.style.display = "none";
-  });
-
-  // Save Discord
-  saveDiscordBtn.addEventListener("click", () => {
-    const discordName = discordInput.value.trim();
-    if (!discordName) {
-      alert("Please enter your Discord username");
-      return;
+    // Save discord username under wallet (overwrites only if different)
+    async function saveDiscordForWallet(wallet, username) {
+      if (!wallet || !username) return false;
+      try {
+        await set(ref(db, `discordUsernames/${wallet}`), {
+          username,
+          timestamp: Date.now()
+        });
+        return true;
+      } catch (err) {
+        console.error("Firebase write error:", err);
+        return false;
+      }
     }
-    firebase.database().ref("users/" + currentWallet).set({
-      wallet: currentWallet,
-      discord: discordName
-    }).then(() => {
-      alert("Discord saved!");
-      discordSection.style.display = "none";
-    });
-  });
 
-  // Check if Discord exists
-  function checkDiscord() {
-    firebase.database().ref("users/" + currentWallet).once("value", snapshot => {
-      if (snapshot.exists()) {
-        discordSection.style.display = "none";
+    // Update UI after connect
+    async function onWalletConnected(addr) {
+      currentWallet = addr;
+      walletAddressDisplay.innerText = `Connected: ${addr}`;
+      loginBtn.style.display = "none";
+      logoutBtn.style.display = "inline-block";
+      payBtn.disabled = false;
+
+      // show discord input row
+      discordRow.style.display = "flex";
+      discordInput.value = "";
+      submitDiscordBtn.disabled = true; // until we know state
+
+      // check firebase for existing username
+      const existing = await getDiscordForWallet(addr);
+      if (existing) {
+        discordInput.value = existing;
+        discordInput.disabled = true;
+        submitDiscordBtn.disabled = true;
       } else {
-        discordSection.style.display = "block";
+        discordInput.disabled = false;
+        submitDiscordBtn.disabled = false;
+      }
+    }
+
+    // Connect wallet
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert("Please install MetaMask");
+        return;
+      }
+      try {
+        provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        signer = await provider.getSigner();
+        const wallet = accounts[0];
+        localStorage.setItem("flappy_wallet", wallet);
+        await onWalletConnected(wallet);
+      } catch (err) {
+        console.error("Wallet connect failed:", err);
+        alert("Wallet connect failed. Check console.");
+      }
+    }
+
+    // Disconnect (simple UI-only logout)
+    function disconnectWallet() {
+      localStorage.removeItem("flappy_wallet");
+      currentWallet = null;
+      signer = null;
+      provider = null;
+      walletAddressDisplay.innerText = "";
+      loginBtn.style.display = "inline-block";
+      logoutBtn.style.display = "none";
+      payBtn.disabled = true;
+      discordRow.style.display = "none";
+    }
+
+    // Submit discord button handler
+    submitDiscordBtn.addEventListener("click", async () => {
+      const username = (discordInput.value || "").trim();
+      if (!username) {
+        alert("Please enter your Discord username (e.g. User#1234).");
+        return;
+      }
+      if (!currentWallet) {
+        alert("Please connect wallet first.");
+        return;
+      }
+      submitDiscordBtn.disabled = true;
+      const ok = await saveDiscordForWallet(currentWallet, username);
+      if (ok) {
+        discordInput.disabled = true;
+        alert("Discord username saved for your wallet.");
+      } else {
+        alert("Failed to save Discord. Check console.");
+        submitDiscordBtn.disabled = false;
       }
     });
-  }
 
-  // Payment
-  payBtn.addEventListener("click", async () => {
-    const contract = new ethers.Contract(contractAddress, abi, signer);
-    const tx = await contract.payToPlay({ value: ethers.parseEther("0.2") });
-    await tx.wait();
+    // Pay button handler (keeps your existing pay flow)
+    payBtn.addEventListener("click", async () => {
+      if (!signer) {
+        alert("Please connect wallet first.");
+        return;
+      }
+      try {
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+        const tx = await contract.payToPlay({ value: ethers.parseEther("0.2") });
+        await tx.wait();
 
-    localStorage.setItem("flappy_plays", "3");
-    localStorage.setItem("flappy_paid", "true");
-    alert("✅ Payment successful! You now have 3 plays.");
-    window.location.href = "game.html";
-  });
-</script>
+        localStorage.setItem("flappy_plays", "3");
+        localStorage.setItem("flappy_paid", "true");
+        alert("✅ Payment successful! You now have 3 plays.");
+        window.location.href = "game.html";
+      } catch (err) {
+        console.error("❌ Payment error:", err);
+        alert("Payment failed. Please try again.");
+      }
+    });
+
+    // Login / logout click wiring
+    loginBtn.addEventListener("click", connectWallet);
+    logoutBtn.addEventListener("click", () => {
+      disconnectWallet();
+    });
+
+    // If user previously connected, auto-check and restore UI
+    (async function restoreFromStorage() {
+      const saved = localStorage.getItem("flappy_wallet");
+      if (saved && window.ethereum) {
+        // try to connect silently (eth_requestAccounts may pop otherwise)
+        try {
+          provider = new ethers.BrowserProvider(window.ethereum);
+          // check if saved account is available in provider
+          const accounts = await provider.send("eth_accounts", []);
+          if (accounts && accounts.length && accounts[0].toLowerCase() === saved.toLowerCase()) {
+            signer = await provider.getSigner();
+            await onWalletConnected(saved);
+          } else {
+            // not already authorized: don't auto-call request, just show login button
+            localStorage.removeItem("flappy_wallet");
+          }
+        } catch (err) {
+          console.warn("Silent restore failed", err);
+          localStorage.removeItem("flappy_wallet");
+        }
+      }
+    })();
+  </script>
 </body>
 </html>
