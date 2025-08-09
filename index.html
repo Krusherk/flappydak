@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 
   <style>
     body {
@@ -17,12 +19,6 @@
       font-family: 'Press Start 2P', cursive;
       color: white;
       text-align: center;
-    }
-
-    body, h1, .start-btn, footer {
-      -webkit-font-smoothing: none;
-      -moz-osx-font-smoothing: grayscale;
-      font-smooth: never;
     }
 
     .home-container {
@@ -39,16 +35,24 @@
       text-shadow: 2px 2px black;
     }
 
-    .start-btn, #loginBtn, #logoutBtn {
+    /* Button styling */
+    .btn {
       padding: 10px 20px;
       font-size: 14px;
       border: 2px solid white;
       background: black;
       color: white;
       cursor: pointer;
+      transition: 0.3s ease;
     }
 
-    .start-btn:disabled {
+    .btn:hover {
+      background: linear-gradient(135deg, #9a42f3, #d1a3ff);
+      box-shadow: 0 6px 20px rgba(126, 48, 225, 0.6);
+      transform: scale(1.05);
+    }
+
+    .btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
@@ -67,54 +71,73 @@
       font-family: sans-serif;
       color: white;
     }
+
+    input {
+      padding: 8px;
+      font-size: 14px;
+      border: 2px solid white;
+      background: black;
+      color: white;
+      text-align: center;
+    }
   </style>
 </head>
-
 <body>
   <div class="home-container">
     <h1>Welcome to Flappy Dak</h1>
 
-    <!-- 🔐 Login / Logout -->
-    <button id="loginBtn">Login with MetaMask</button>
-    <button id="logoutBtn" style="display:none;">Logout</button>
+    <!-- Wallet login -->
+    <button id="loginBtn" class="btn">Login with MetaMask</button>
+    <button id="logoutBtn" class="btn" style="display:none;">Logout</button>
     <div id="walletAddress"></div>
 
-    
-    <!-- 💸 Pay and Play -->
-    <button class="start-btn" id="payToPlayBtn" disabled>Pay 0.2 MON to Get 3 Plays</button> <!-- ✅ changed -->
+    <!-- Discord username -->
+    <div id="discordSection" style="display:none;">
+      <input type="text" id="discordInput" placeholder="Enter Discord username" />
+      <button id="saveDiscordBtn" class="btn">Save Discord</button>
+    </div>
+
+    <!-- Pay button -->
+    <button class="btn" id="payToPlayBtn" disabled>Pay 0.2 MON to Get 3 Plays</button>
   </div>
 
   <footer>made by crack</footer>
 
-<script>
-const contractAddress = "0x5d114a14f98086c14E9fC4B85092a5C30d69419b";
-const abi = [
-  {
-    "inputs": [],
-    "name": "payToPlay",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "player", "type": "address" }],
-    "name": "remainingPlays",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  }
-];
+<script type="module">
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJC8jBpf4RJcrjAhgYumUmYzlOxma-ojk",
+    authDomain: "flappydak.firebaseapp.com",
+    databaseURL: "https://flappydak-default-rtdb.firebaseio.com",
+    projectId: "flappydak",
+    storageBucket: "flappydak.firebasestorage.app",
+    messagingSenderId: "189314171470",
+    appId: "1:189314171470:web:4c3a9068fdb909b147791f",
+    measurementId: "G-R0LF3F59W9"
+  };
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-let signer;
-let provider;
+  const contractAddress = "0x5d114a14f98086c14E9fC4B85092a5C30d69419b";
+  const abi = [
+    { "inputs": [], "name": "payToPlay", "outputs": [], "stateMutability": "payable", "type": "function" },
+    { "inputs": [{ "internalType": "address", "name": "player", "type": "address" }], "name": "remainingPlays", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }
+  ];
 
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const payBtn = document.getElementById("payToPlayBtn");
-const walletAddressDisplay = document.getElementById("walletAddress");
+  let signer;
+  let provider;
+  let currentWallet = null;
 
-loginBtn.addEventListener("click", async () => {
-  try {
+  const loginBtn = document.getElementById("loginBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const payBtn = document.getElementById("payToPlayBtn");
+  const walletAddressDisplay = document.getElementById("walletAddress");
+  const discordSection = document.getElementById("discordSection");
+  const discordInput = document.getElementById("discordInput");
+  const saveDiscordBtn = document.getElementById("saveDiscordBtn");
+
+  // Wallet login
+  loginBtn.addEventListener("click", async () => {
     if (!window.ethereum) {
       alert("Please install MetaMask");
       return;
@@ -123,42 +146,65 @@ loginBtn.addEventListener("click", async () => {
     provider = new ethers.BrowserProvider(window.ethereum);
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     signer = await provider.getSigner();
+    currentWallet = accounts[0];
+    localStorage.setItem("flappy_wallet", currentWallet);
+    walletAddressDisplay.innerText = `Connected: ${currentWallet}`;
 
-    const wallet = accounts[0];
-    localStorage.setItem("flappy_wallet", wallet);
-    walletAddressDisplay.innerText = `Connected: ${wallet}`;
     loginBtn.style.display = "none";
     logoutBtn.style.display = "inline-block";
     payBtn.disabled = false;
-  } catch (err) {
-    console.error("Login failed:", err);
-    alert("Login failed. Please try again.");
-  }
-});
 
-logoutBtn.addEventListener("click", () => {
-  localStorage.removeItem("flappy_wallet");
-  walletAddressDisplay.innerText = "";
-  loginBtn.style.display = "inline-block";
-  logoutBtn.style.display = "none";
-  payBtn.disabled = true;
-});
+    checkDiscord();
+  });
 
-payBtn.addEventListener("click", async () => {
-  try {
-    const contract = new ethers.Contract(contractAddress, abi, signer);
-    const tx = await contract.payToPlay({
-      value: ethers.parseEther("0.2")
+  // Logout
+  logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("flappy_wallet");
+    walletAddressDisplay.innerText = "";
+    loginBtn.style.display = "inline-block";
+    logoutBtn.style.display = "none";
+    payBtn.disabled = true;
+    discordSection.style.display = "none";
+  });
+
+  // Save Discord
+  saveDiscordBtn.addEventListener("click", () => {
+    const discordName = discordInput.value.trim();
+    if (!discordName) {
+      alert("Please enter your Discord username");
+      return;
+    }
+    firebase.database().ref("users/" + currentWallet).set({
+      wallet: currentWallet,
+      discord: discordName
+    }).then(() => {
+      alert("Discord saved!");
+      discordSection.style.display = "none";
     });
+  });
+
+  // Check if Discord exists
+  function checkDiscord() {
+    firebase.database().ref("users/" + currentWallet).once("value", snapshot => {
+      if (snapshot.exists()) {
+        discordSection.style.display = "none";
+      } else {
+        discordSection.style.display = "block";
+      }
+    });
+  }
+
+  // Payment
+  payBtn.addEventListener("click", async () => {
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+    const tx = await contract.payToPlay({ value: ethers.parseEther("0.2") });
     await tx.wait();
 
     localStorage.setItem("flappy_plays", "3");
     localStorage.setItem("flappy_paid", "true");
     alert("✅ Payment successful! You now have 3 plays.");
     window.location.href = "game.html";
-  } catch (err) {
-    console.error("❌ Payment error:", err);
-    alert("Payment failed. Please try again.");
-  }
-});
+  });
 </script>
+</body>
+</html>
