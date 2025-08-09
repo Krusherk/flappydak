@@ -1,3 +1,14 @@
+// At the very top of your script, before game logic runs:
+let paid = localStorage.getItem("flappy_paid");
+let plays = parseInt(localStorage.getItem("flappy_plays") || "0");
+
+// Check if payment made & plays available
+if (!paid || plays <= 0) {
+  alert("❌ You must pay 0.2 MON to play (3 plays per payment).");
+  window.location.href = "index.html";
+}
+
+// Your existing variables
 let move_speed = 3, gravity = 0.5;
 let bird = document.querySelector('.bird');
 let img = document.getElementById('bird-1');
@@ -22,6 +33,17 @@ let pipe_separation = 0;
 let pipe_gap = 35;
 let pipes = [];
 let animationFrames = [];
+
+// ====== ENFORCE PLAY LIMIT ON GAME END ======
+function deductPlay() {
+  plays = Math.max(plays - 1, 0);
+  localStorage.setItem("flappy_plays", plays);
+  if (plays <= 0) {
+    localStorage.removeItem("flappy_paid");
+    alert("❌ No plays left. Please pay 0.2 MON to continue.");
+    window.location.href = "index.html";
+  }
+}
 
 function resetGame() {
   document.querySelectorAll('.pipe_sprite').forEach(e => e.remove());
@@ -49,20 +71,7 @@ function endGame() {
   message.classList.add('messageStyle');
   sound_die.play();
   submitScore();
-}
-function endGame() {
-  // ... your existing game over logic ...
-
-  // Deduct a play on every game end
-  let plays = parseInt(localStorage.getItem("flappy_plays") || "0");
-  plays = Math.max(plays - 1, 0);
-  localStorage.setItem("flappy_plays", plays);
-
-  if (plays <= 0) {
-    localStorage.removeItem("flappy_paid");
-    alert("❌ No plays left. Please pay 0.2 MON to continue.");
-    window.location.href = "index.html";
-  }
+  deductPlay(); // <-- Deduct after each completed game
 }
 
 document.addEventListener('keydown', (e) => {
