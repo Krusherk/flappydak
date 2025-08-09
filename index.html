@@ -79,35 +79,12 @@
     <button id="logoutBtn" style="display:none;">Logout</button>
     <div id="walletAddress"></div>
 
-<!-- Discord Username Input -->
-<div id="discordSection" style="display:none; margin-top: 15px;">
-  <input type="text" id="discordInput" placeholder="Enter Discord username" style="padding:5px; font-size:12px;">
-  <button id="saveDiscordBtn">Save Discord Username</button>
-</div>
-
+    
     <!-- 💸 Pay and Play -->
     <button class="start-btn" id="payToPlayBtn" disabled>Pay 0.2 MON to Get 3 Plays</button> <!-- ✅ changed -->
   </div>
 
   <footer>made by crack</footer>
-
-  <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBJC8jBpf4RJcrjAhgYumUmYzlOxma-ojk",
-  authDomain: "flappydak.firebaseapp.com",
-  databaseURL: "https://flappydak-default-rtdb.firebaseio.com",
-  projectId: "flappydak",
-  storageBucket: "flappydak.firebasestorage.app",
-  messagingSenderId: "189314171470",
-  appId: "1:189314171470:web:4c3a9068fdb909b147791f",
-  measurementId: "G-R0LF3F59W9"
-};
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-</script>
 
 <script>
 const contractAddress = "0x5d114a14f98086c14E9fC4B85092a5C30d69419b";
@@ -165,62 +142,6 @@ logoutBtn.addEventListener("click", () => {
   loginBtn.style.display = "inline-block";
   logoutBtn.style.display = "none";
   payBtn.disabled = true;
-});
-
-const discordSection = document.getElementById("discordSection");
-const discordInput = document.getElementById("discordInput");
-const saveDiscordBtn = document.getElementById("saveDiscordBtn");
-
-// Show Discord section after login
-loginBtn.addEventListener("click", async () => {
-  try {
-    if (!window.ethereum) {
-      alert("Please install MetaMask");
-      return;
-    }
-
-    provider = new ethers.BrowserProvider(window.ethereum);
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    signer = await provider.getSigner();
-
-    const wallet = accounts[0];
-    localStorage.setItem("flappy_wallet", wallet);
-    walletAddressDisplay.innerText = `Connected: ${wallet}`;
-    loginBtn.style.display = "none";
-    logoutBtn.style.display = "inline-block";
-    payBtn.disabled = false;
-    discordSection.style.display = "block"; // show Discord input
-  } catch (err) {
-    console.error("Login failed:", err);
-    alert("Login failed. Please try again.");
-  }
-});
-
-// Save Discord username to Firebase
-saveDiscordBtn.addEventListener("click", () => {
-  const wallet = localStorage.getItem("flappy_wallet");
-  const discordUsername = discordInput.value.trim();
-
-  if (!wallet) {
-    alert("Please connect your wallet first.");
-    return;
-  }
-  if (!discordUsername) {
-    alert("Please enter your Discord username.");
-    return;
-  }
-
-  firebase.database().ref("users/" + wallet).set({
-    wallet: wallet,
-    discord: discordUsername
-  })
-  .then(() => {
-    alert("✅ Discord username saved!");
-  })
-  .catch((error) => {
-    console.error("Error saving Discord username:", error);
-    alert("Error saving Discord username. Please try again.");
-  });
 });
 
 payBtn.addEventListener("click", async () => {
