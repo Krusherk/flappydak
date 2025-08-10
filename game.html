@@ -9,71 +9,95 @@
   <link rel="stylesheet" href="style.css">
 
   <!-- Firebase Leaderboard Integration -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, set, query, orderByChild, limitToLast, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, query, orderByChild, limitToLast, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBJC8jBpf4RJcrjAhgYumUmYzlOxma-ojk",
-      authDomain: "flappydak.firebaseapp.com",
-      databaseURL: "https://flappydak-default-rtdb.firebaseio.com",
-      projectId: "flappydak",
-      storageBucket: "flappydak.firebasestorage.app",
-      messagingSenderId: "189314171470",
-      appId: "1:189314171470:web:4c3a9068fdb909b147791f",
-      measurementId: "G-R0LF3F59W9"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyBJC8jBpf4RJcrjAhgYumUmYzlOxma-ojk",
+  authDomain: "flappydak.firebaseapp.com",
+  databaseURL: "https://flappydak-default-rtdb.firebaseio.com",
+  projectId: "flappydak",
+  storageBucket: "flappydak.firebasestorage.app",
+  messagingSenderId: "189314171470",
+  appId: "1:189314171470:web:4c3a9068fdb909b147791f",
+  measurementId: "G-R0LF3F59W9"
+};
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-    window.saveScoreToFirebase = function(score) {
-      const wallet = localStorage.getItem("flappy_wallet") || "anon";
-      const scoresRef = ref(db, "scores/" + wallet);
+window.saveScoreToFirebase = function(score) {
+  const discordName = localStorage.getItem("flappy_discord");
+  const wallet = localStorage.getItem("flappy_wallet") || "anon";
+  const playerName = discordName || wallet;
 
-      get(scoresRef).then(snapshot => {
-        const existing = snapshot.exists() ? snapshot.val().score : 0;
-        if (score > existing) {
-          set(scoresRef, {
-            wallet,
-            score,
-            timestamp: Date.now()
-          });
+  const scoresRef = ref(db, "scores/" + wallet);
+
+  get(scoresRef).then(snapshot => {
+    const existing = snapshot.exists() ? snapshot.val().score : 0;
+    if (score > existing) {
+      set(scoresRef, {
+        name: playerName,
+        wallet: wallet,
+        score,
+        timestamp: Date.now()
+      });
+    }
+  });
+};
+
+window.loadLeaderboard = function () {
+  const leaderboardList = document.getElementById("leaderboardList");
+  leaderboardList.innerHTML = "<li>Loading...</li>";
+
+  const scoresRef = ref(db, "scores");
+  const topScoresQuery = query(scoresRef, orderByChild("score"), limitToLast(10));
+
+  onValue(topScoresQuery, (snapshot) => {
+    const scores = [];
+    snapshot.forEach((child) => {
+      scores.push(child.val());
+    });
+
+    scores.reverse(); // highest first
+    leaderboardList.innerHTML = "";
+
+    const currentUserName = localStorage.getItem("flappy_discord") || localStorage.getItem("flappy_wallet");
+
+    // First, fetch current user's actual score from DB
+    get(ref(db, "scores")).then(allSnapshot => {
+      let currentUserEntry = null;
+      allSnapshot.forEach(child => {
+        if (child.val().name === currentUserName) {
+          currentUserEntry = child.val();
         }
       });
-    };
 
-    window.loadLeaderboard = function () {
-      const leaderboardList = document.getElementById("leaderboardList");
-      leaderboardList.innerHTML = "<li>Loading...</li>";
+      // Show current user's score at top (gold), even if not in top 10
+      if (currentUserEntry) {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${currentUserEntry.name}</strong> - ${currentUserEntry.score}`;
+        li.style.color = "#FFD700"; // gold
+        leaderboardList.appendChild(li);
+      }
 
-      const scoresRef = ref(db, "scores");
-      const topScoresQuery = query(scoresRef, orderByChild("score"), limitToLast(10));
-
-      onValue(topScoresQuery, (snapshot) => {
-        const scores = [];
-        snapshot.forEach((child) => {
-          scores.push(child.val());
-        });
-
-        scores.reverse(); // highest first
-        leaderboardList.innerHTML = "";
-
-        scores.forEach((entry, index) => {
+      // Show top 10 list (skip duplicate of current user)
+      scores.forEach((entry, index) => {
+        if (!currentUserEntry || entry.name !== currentUserEntry.name) {
           const li = document.createElement("li");
-          li.innerHTML = `
-            <strong>#${index + 1}</strong>
-            ${entry.wallet.slice(0, 6)}...${entry.wallet.slice(-4)} - ${entry.score}
-          `;
+          li.innerHTML = `<strong>#${index + 1}</strong> ${entry.name} - ${entry.score}`;
           leaderboardList.appendChild(li);
-        });
+        }
       });
-    };
-
-    window.addEventListener("DOMContentLoaded", () => {
-      loadLeaderboard();
     });
-  </script>
+  });
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadLeaderboard();
+});
+</script>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
