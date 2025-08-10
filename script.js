@@ -22,7 +22,7 @@ let score_val = document.querySelector('.score_val');
 let message = document.querySelector('.message');
 let score_title = document.querySelector('.score_title');
 let highscore = parseInt(localStorage.getItem("flappy_highscore") || "0");
-score_title.innerHTML = `Score : <br>High : ${highscore}`;
+score_title.innerHTML = "SCORE";
 
 let game_state = 'Start';
 message.classList.add('messageStyle');
@@ -55,7 +55,7 @@ function resetGame() {
   pipes = [];
   game_state = 'Play';
   score_val.innerHTML = '0';
-  score_title.innerHTML = `Score : <br>High : ${highscore}`;
+  score_title.innerHTML = "SCORE";
   message.innerHTML = '';
   message.classList.remove('messageStyle');
   bird_props = bird.getBoundingClientRect();
@@ -182,3 +182,4 @@ if (score > highscore) {
   highscore = score;
   localStorage.setItem("flappy_highscore", highscore.toString());
 }
+
