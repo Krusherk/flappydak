@@ -263,7 +263,19 @@ html, body {
   border: 2px solid #999;
   box-shadow: none;
 }
+.score_val {
+  font-size: 20px; /* smaller */
+  font-weight: bold;
+  background: linear-gradient(135deg, #ff00cc, #3333ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 .score_title {
   font-size: 16px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #ff9933, #ff3366);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
+
 
