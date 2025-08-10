@@ -263,3 +263,7 @@ html, body {
   border: 2px solid #999;
   box-shadow: none;
 }
+.score_title {
+  font-size: 16px;
+}
+
