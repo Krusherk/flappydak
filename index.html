@@ -180,6 +180,7 @@
       }
     }
 
+
     // Update UI after connect
     async function onWalletConnected(addr) {
       currentWallet = addr;
@@ -239,25 +240,25 @@
 
     // Submit discord button handler
     submitDiscordBtn.addEventListener("click", async () => {
-      const username = (discordInput.value || "").trim();
-      if (!username) {
-        alert("Please enter your Discord username (e.g. User#1234).");
-        return;
-      }
-      if (!currentWallet) {
-        alert("Please connect wallet first.");
-        return;
-      }
-      submitDiscordBtn.disabled = true;
-      const ok = await saveDiscordForWallet(currentWallet, username);
-      if (ok) {
-        discordInput.disabled = true;
-        alert("Discord username saved for your wallet.");
-      } else {
-        alert("Failed to save Discord. Check console.");
-        submitDiscordBtn.disabled = false;
-      }
-    });
+  const username = discordInput.value.trim();
+  if (!currentWallet) {
+    alert("Connect your wallet first.");
+    return;
+  }
+  if (!username) {
+    alert("Please enter your Discord username.");
+    return;
+  }
+
+  const saved = await saveDiscordForWallet(currentWallet, username);
+  if (saved) {
+    // Save locally so game.html can use it without fetching
+    localStorage.setItem("flappy_discord", username);
+    alert("Discord username saved!");
+  } else {
+    alert("Error saving username. Please try again.");
+  }
+});
 
     // Pay button handler (keeps your existing pay flow)
     payBtn.addEventListener("click", async () => {
@@ -311,3 +312,4 @@
   </script>
 </body>
 </html>
+
