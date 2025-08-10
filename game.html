@@ -51,53 +51,58 @@ window.loadLeaderboard = function () {
   const leaderboardList = document.getElementById("leaderboardList");
   leaderboardList.innerHTML = "<li>Loading...</li>";
 
+  const myWallet = (localStorage.getItem("flappy_wallet") || "").toLowerCase();
+  const myDiscord = localStorage.getItem("flappy_discord") || "";
+
   const scoresRef = ref(db, "scores");
   const topScoresQuery = query(scoresRef, orderByChild("score"), limitToLast(10));
 
-  onValue(topScoresQuery, (snapshot) => {
+  onValue(topScoresQuery, async (snapshot) => {
     const scores = [];
     snapshot.forEach((child) => {
       scores.push(child.val());
     });
-
     scores.reverse(); // highest first
+
     leaderboardList.innerHTML = "";
 
-    const myWallet = localStorage.getItem("flappy_wallet") || "";
-    const myDiscord = localStorage.getItem("flappy_discord") || "";
+    // Fetch all Discord usernames from DB
+    const discordSnap = await get(ref(db, "discordUsernames"));
+    const discordData = discordSnap.exists() ? discordSnap.val() : {};
 
-    get(ref(db, "scores")).then(allSnapshot => {
-      let currentUserEntry = null;
-      allSnapshot.forEach(child => {
-        const val = child.val();
-        if (val.wallet?.toLowerCase() === myWallet.toLowerCase()) {
-          currentUserEntry = {
-            ...val,
-            name: myDiscord || val.name || val.wallet
-          };
-        }
-      });
-
-      // Show current user's score at top (gold), even if not in top 10
-      if (currentUserEntry) {
-        const li = document.createElement("li");
-        li.innerHTML = `<strong>${currentUserEntry.name}</strong> - ${currentUserEntry.score}`;
-        li.style.color = "#FFD700"; // gold
-        leaderboardList.appendChild(li);
+    // Find my entry in full scores list
+    const allScoresSnap = await get(scoresRef);
+    let currentUserEntry = null;
+    allScoresSnap.forEach(child => {
+      const val = child.val();
+      if (val.wallet?.toLowerCase() === myWallet) {
+        currentUserEntry = {
+          ...val,
+          name: myDiscord || discordData[myWallet]?.username || val.name || val.wallet
+        };
       }
+    });
 
-      // Show top 10 list (skip duplicate of current user)
-      scores.forEach((entry, index) => {
-        const displayName = (entry.wallet?.toLowerCase() === myWallet.toLowerCase())
-          ? (myDiscord || entry.name || entry.wallet)
-          : (entry.name || entry.wallet);
+    // Show my score on top (gold) if not in top 10
+    const isInTop10 = scores.some(s => s.wallet?.toLowerCase() === myWallet);
+    if (currentUserEntry && !isInTop10) {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${currentUserEntry.name}</strong> - ${currentUserEntry.score}`;
+      li.style.color = "#FFD700"; // gold
+      leaderboardList.appendChild(li);
+    }
 
-        if (!currentUserEntry || entry.wallet?.toLowerCase() !== myWallet.toLowerCase()) {
-          const li = document.createElement("li");
-          li.innerHTML = `<strong>#${index + 1}</strong> ${displayName} - ${entry.score}`;
-          leaderboardList.appendChild(li);
-        }
-      });
+    // Show top 10 list
+    scores.forEach((entry, index) => {
+      const walletLower = entry.wallet?.toLowerCase();
+      const displayName =
+        walletLower === myWallet
+          ? currentUserEntry?.name
+          : discordData[walletLower]?.username || entry.name || entry.wallet;
+
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>#${index + 1}</strong> ${displayName} - ${entry.score}`;
+      leaderboardList.appendChild(li);
     });
   });
 };
