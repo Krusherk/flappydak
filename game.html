@@ -63,14 +63,18 @@ window.loadLeaderboard = function () {
     scores.reverse(); // highest first
     leaderboardList.innerHTML = "";
 
-    const currentUserName = localStorage.getItem("flappy_discord") || localStorage.getItem("flappy_wallet");
+    const myWallet = localStorage.getItem("flappy_wallet") || "";
+    const myDiscord = localStorage.getItem("flappy_discord") || "";
 
-    // First, fetch current user's actual score from DB
     get(ref(db, "scores")).then(allSnapshot => {
       let currentUserEntry = null;
       allSnapshot.forEach(child => {
-        if (child.val().name === currentUserName) {
-          currentUserEntry = child.val();
+        const val = child.val();
+        if (val.wallet?.toLowerCase() === myWallet.toLowerCase()) {
+          currentUserEntry = {
+            ...val,
+            name: myDiscord || val.name || val.wallet
+          };
         }
       });
 
@@ -84,9 +88,13 @@ window.loadLeaderboard = function () {
 
       // Show top 10 list (skip duplicate of current user)
       scores.forEach((entry, index) => {
-        if (!currentUserEntry || entry.name !== currentUserEntry.name) {
+        const displayName = (entry.wallet?.toLowerCase() === myWallet.toLowerCase())
+          ? (myDiscord || entry.name || entry.wallet)
+          : (entry.name || entry.wallet);
+
+        if (!currentUserEntry || entry.wallet?.toLowerCase() !== myWallet.toLowerCase()) {
           const li = document.createElement("li");
-          li.innerHTML = `<strong>#${index + 1}</strong> ${entry.name} - ${entry.score}`;
+          li.innerHTML = `<strong>#${index + 1}</strong> ${displayName} - ${entry.score}`;
           leaderboardList.appendChild(li);
         }
       });
