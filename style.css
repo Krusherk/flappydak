@@ -263,19 +263,20 @@ html, body {
   border: 2px solid #999;
   box-shadow: none;
 }
-.score_val {
-  font-size: 20px; /* smaller */
+.score_title {
+  font-size: 24px;
   font-weight: bold;
+  letter-spacing: 2px;
   background: linear-gradient(135deg, #ff00cc, #3333ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  margin-bottom: 5px; /* space before the number */
 }
-.score_title {
-  font-size: 16px;
+
+.score_val {
+  font-size: 48px; /* big number */
   font-weight: bold;
-  background: linear-gradient(135deg, #ff9933, #ff3366);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 0, 200, 0.8),
+               0 0 20px rgba(51, 51, 255, 0.8);
 }
-
-
