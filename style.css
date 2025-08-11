@@ -269,19 +269,23 @@ html, body {
   right: 20px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 14px;
-  background-color: rgba(0, 0, 0, 0.8);
+  gap: 8px;
+  padding: 6px 10px;
+  background-color: rgba(0, 0, 0, 0.85);
   border: 2px solid #FFD700;
-  border-radius: 6px;
+  border-radius: 4px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 14px;
+  font-size: 18px; /* bigger */
   color: #FFD700;
   z-index: 1000;
+  white-space: nowrap; /* keeps it compact */
 }
+
 .score_title {
   font-weight: bold;
 }
+
 .score_val {
   font-weight: bold;
+  font-size: 20px; /* even bigger number */
 }
