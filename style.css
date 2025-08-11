@@ -266,18 +266,25 @@ html, body {
 .score {
   position: absolute;
   top: 20px;
-  left: 20px; /* or right: 20px if you want it on the right */
-  display: inline-block;
-  padding: 5px 12px;
-  background: rgba(0, 0, 0, 0.5); /* faint dark background for readability */
+  left: 50%;
+  transform: translateX(-50%); /* Center horizontally */
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.5); /* faint background */
   border-radius: 6px;
+  
   font-family: 'Press Start 2P', monospace;
-  font-size: 28px; /* bigger text */
+  font-size: 32px; /* bigger */
   color: #FFD700; /* bright yellow */
   border: 2px solid #FFD700;
+  text-shadow: none; /* remove shadows */
   white-space: nowrap;
+  
   z-index: 9999;
-  text-shadow: none; /* remove stroke effect */
 }
 
 .score_title {
@@ -288,4 +295,5 @@ html, body {
   font-weight: bold;
   font-size: 20px;
 }
+
 
