@@ -267,7 +267,7 @@ html, body {
   position: absolute;
   top: 20px;
   right: 20px;
-  display: flex;
+  display: inline-flex; /* shrink to fit */
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
@@ -275,10 +275,10 @@ html, body {
   border: 2px solid #FFD700;
   border-radius: 4px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 18px; /* bigger */
+  font-size: 18px;
   color: #FFD700;
   z-index: 1000;
-  white-space: nowrap; /* keeps it compact */
+  white-space: nowrap; /* keep text in one line */
 }
 
 .score_title {
@@ -287,5 +287,5 @@ html, body {
 
 .score_val {
   font-weight: bold;
-  font-size: 20px; /* even bigger number */
+  font-size: 20px;
 }
