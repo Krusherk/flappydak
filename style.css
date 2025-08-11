@@ -263,19 +263,28 @@ html, body {
   border: 2px solid #999;
   box-shadow: none;
 }
+/* Match score UI to leaderboard style */
+.score {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 2px solid #FFD700;
+  border-radius: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  color: #FFD700;
+  z-index: 1000;
+}
+
 .score_title {
-  font-size: 28px; /* bigger label */
   font-weight: bold;
-  color: #ffdd00; /* bright yellow */
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-  margin-bottom: 5px;
 }
 
 .score_val {
-  font-size: 64px; /* big number */
   font-weight: bold;
-  color: #ffdd00; /* bright yellow */
-  text-shadow: 0 0 8px rgba(255, 221, 0, 0.8),
-               0 0 16px rgba(255, 221, 0, 0.6),
-               2px 2px 4px rgba(0,0,0,0.7);
 }
