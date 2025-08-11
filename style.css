@@ -59,24 +59,31 @@
 }
 
 .score {
-	position: fixed;
-	z-index: 10;
-	height: 10vh;
-	font-size: 10vh;
-	font-weight: 100;
-	color: white;
-	-webkit-text-stroke-width: 2px;
-    -webkit-text-stroke-color: black;
-	top: 0;
-	left: 0;
-	margin: 10px;
-	font-family: Arial, Helvetica, sans-serif;
+    position: fixed;
+    z-index: 10;
+    height: 10vh;
+    font-size: 10vh; /* big text */
+    font-weight: bold;
+    color: gold; /* yellow for the label too */
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    align-items: center; /* vertical center */
+    justify-content: center; /* horizontal center */
+    background: transparent; /* no box background */
+    -webkit-text-stroke: 0; /* remove black outline */
+    text-shadow: none; /* remove any shadows */
 }
 
 .score_val {
-	color: gold;
-	font-weight: bold;
+    color: gold; /* bright yellow for number */
+    font-weight: bold;
+    margin-left: 10px; /* space between text and number */
 }
+
 
 footer {
 	font-size: 20px;               /* UPDATED: Bigger text */
@@ -295,5 +302,6 @@ html, body {
   font-weight: bold;
   font-size: 20px;
 }
+
 
 
