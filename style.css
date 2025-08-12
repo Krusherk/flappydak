@@ -235,6 +235,10 @@ html, body {
   min-width: 30px;
   text-align: right;
 }
+.rank {
+  margin-right: 4px; /* one small space between rank and name */
+}
+
 .timestamp {
   font-size: 6px;
   color: #aaa;
@@ -324,4 +328,5 @@ footer {
 .link-text:hover {
   color: #ffcc00; /* hover effect */
 }
+
 
