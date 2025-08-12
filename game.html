@@ -101,7 +101,7 @@ window.loadLeaderboard = function () {
           : discordData[walletLower]?.username || entry.name || entry.wallet;
 
       const li = document.createElement("li");
-      li.innerHTML = `<strong>#${index + 1}</strong> ${displayName} - ${entry.score}`;
+      li.innerHTML = `<span class="rank">#${index + 1}</span><span class="name">${displayName}</span><span class="score">${entry.score}</span>`;
       leaderboardList.appendChild(li);
     });
   });
