@@ -222,19 +222,19 @@ html, body {
   color: #cd7f32; /* bronze */
 }
 
-.leaderboard-player {
+.leaderboard-list .leaderboard-player {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.leaderboard-score {
-  margin-left: 8px;
-  color: #fff;
+.leaderboard-list .leaderboard-score {
+  color: yellow;
   font-weight: bold;
+  min-width: 30px;
+  text-align: right;
 }
-
 .timestamp {
   font-size: 6px;
   color: #aaa;
@@ -324,3 +324,4 @@ footer {
 .link-text:hover {
   color: #ffcc00; /* hover effect */
 }
+
