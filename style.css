@@ -302,6 +302,26 @@ html, body {
   font-weight: bold;
   font-size: 20px;
 }
+footer {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-family: 'Press Start 2P', cursive;
+  color: white;
+  font-size: 10px;
+}
+
+footer a {
+  font-family: 'Press Start 2P', cursive;
+  color: white;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
 
 
 
