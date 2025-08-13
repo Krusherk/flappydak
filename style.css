@@ -246,7 +246,8 @@ html, body {
 }
 #loginBtn,
 #logoutBtn,
-.start-btn {
+.start-btn,
+#submitDiscordBtn {
   padding: 12px 24px;
   font-size: 12px;
   font-family: 'Press Start 2P', monospace;
@@ -261,11 +262,13 @@ html, body {
 
 #loginBtn:hover,
 #logoutBtn:hover,
-.start-btn:hover {
+.start-btn:hover,
+#submitDiscordBtn:hover {
   background: linear-gradient(135deg, #9a42f3, #d1a3ff);
   box-shadow: 0 6px 20px rgba(126, 48, 225, 0.6);
   transform: scale(1.05);
 }
+
 
 .start-btn:disabled {
   opacity: 0.5;
@@ -328,5 +331,6 @@ footer {
 .link-text:hover {
   color: #ffcc00; /* hover effect */
 }
+
 
 
