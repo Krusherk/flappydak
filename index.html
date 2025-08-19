@@ -318,9 +318,23 @@
         }
       }
     })();
+
+const startBtn = document.getElementById("startBtn");
+const mainMenu = document.getElementById("mainMenu");
+
+startBtn.addEventListener("click", () => {
+  // Animate and remove START button
+  startBtn.classList.add("fade-out");
+  setTimeout(() => {
+    startBtn.style.display = "none";
+    // Show main menu with fade-in
+    mainMenu.classList.add("fade-in");
+  }, 500); // match transition duration
+});
   </script>
 </body>
 </html>
+
 
 
 
