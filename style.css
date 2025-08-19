@@ -331,6 +331,29 @@ footer {
 .link-text:hover {
   color: #ffcc00; /* hover effect */
 }
+#startBtn {
+  font-size: 18px;
+  padding: 16px 32px;
+}
+
+.fade-out {
+  opacity: 0;
+  transform: scale(1.2);
+  transition: all 0.5s ease;
+}
+
+.fade-in {
+  display: block !important;
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
 
 
 
