@@ -9,15 +9,19 @@
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
 
   <style>
-    body {
-      margin: 0;
-      background-image: url('images/dakdak.png');
-      background-size: cover;
-      background-position: center;
-      font-family: 'Press Start 2P', cursive;
-      color: white;
-      text-align: center;
-    }
+body {
+  margin: 0;
+  height: 100vh;
+  background-image: url('images/dakdak.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* 👈 keeps it locked in place */
+  font-family: 'Press Start 2P', cursive;
+  color: white;
+  text-align: center;
+  overflow: hidden; /* 👈 prevents scrollbars from appearing */
+}
 
     body, h1, .start-btn, footer {
       -webkit-font-smoothing: none;
@@ -345,6 +349,7 @@ startBtn.addEventListener("click", () => {
   </script>
 </body>
 </html>
+
 
 
 
