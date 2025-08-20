@@ -354,7 +354,6 @@ footer {
   }
 }
 <style>
-
 #startBtn {
   font-size: 16px;
   padding: 10px 20px;
@@ -363,9 +362,11 @@ footer {
   color: white;
   border-radius: 8px;
   cursor: not-allowed;
-
-  margin-top: 96px; /* 👈 moves it down ~1 inch */
+  margin-top: 96px; /* Already lowered ~1 inch */
   transition: all 0.3s ease;
+  display: block;
+  margin-left: auto;
+  margin-right: auto; /* Center horizontally */
 }
 
 #startBtn:enabled {
@@ -381,7 +382,16 @@ footer {
   transform: scale(1.05);
 }
 
+#tempNotice {
+  margin-top: 20px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px; /* Bigger than before */
+  color: yellow;
+  text-shadow: 1px 1px black;
+  text-align: center;
+}
 <style>
+
 
 
 
