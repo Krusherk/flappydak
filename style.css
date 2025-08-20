@@ -355,14 +355,14 @@ footer {
 }
 <style>
 #startBtn {
-  font-size: 16px;
-  padding: 10px 20px;
+  font-size: 18px;
+  padding: 12px 28px;
   border: 2px solid white;
   background: gray; /* Disabled state */
   color: white;
   border-radius: 8px;
   cursor: not-allowed;
-  margin-top: 96px; /* Already lowered ~1 inch */
+  margin-top: 160px; /* Lowered further (~1.5–2 inches) */
   transition: all 0.3s ease;
   display: block;
   margin-left: auto;
@@ -383,14 +383,15 @@ footer {
 }
 
 #tempNotice {
-  margin-top: 20px;
+  margin-top: 30px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 16px; /* Bigger than before */
+  font-size: 22px; /* Much bigger */
   color: yellow;
-  text-shadow: 1px 1px black;
+  text-shadow: 2px 2px black; /* Stronger outline */
   text-align: center;
 }
 <style>
+
 
 
 
