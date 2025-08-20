@@ -98,8 +98,6 @@
 
  <!-- START button (initially visible) -->
   <button id="startBtn" class="start-btn">START</button>
-<button id="startBtn" disabled>START</button>
-<div id="countdown" style="margin-top:10px; font-family:'Press Start 2P', cursive; font-size:14px; color:#FFD700; text-shadow:2px 2px 0 black;"></div>
 
   <!-- Hidden by default until START is clicked -->
   <div id="mainMenu" style="display:none;">
@@ -333,45 +331,10 @@ startBtn.addEventListener("click", () => {
     mainMenu.classList.add("fade-in");
   }, 500); // match transition duration
 });
-
-<script>
-function lockStartButtonUntil() {
-  const now = new Date();
-
-  // Target: tomorrow 4 PM
-  const target = new Date();
-  target.setDate(now.getDate() + 1);
-  target.setHours(16, 0, 0, 0);
-
-  const startBtn = document.getElementById("startBtn");
-  const countdownEl = document.getElementById("countdown");
-
-  function updateCountdown() {
-    const currentTime = new Date().getTime();
-    const distance = target.getTime() - currentTime;
-
-    if (distance <= 0) {
-      startBtn.disabled = false;
-      countdownEl.innerText = "✅ You can play now!";
-      clearInterval(interval);
-      return;
-    }
-
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    countdownEl.innerText = `Unlocks in: ${hours}h ${minutes}m ${seconds}s`;
-  }
-
-  updateCountdown();
-  const interval = setInterval(updateCountdown, 1000);
-}
-
-lockStartButtonUntil();
   </script>
 </body>
 </html>
+
 
 
 
