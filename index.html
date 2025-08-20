@@ -97,6 +97,19 @@
 
  <!-- START button (initially visible) -->
   <button id="startBtn" class="start-btn">START</button>
+<button id="startBtn" disabled>Start Game</button>
+
+<p id="tempNotice" style="
+  margin-top: 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: yellow;
+  text-shadow: 1px 1px black;
+  text-align: center;
+">
+  🚧 Game will open soon! 🚧
+</p>
+
 
   <!-- Hidden by default until START is clicked -->
   <div id="mainMenu" style="display:none;">
@@ -333,6 +346,7 @@ startBtn.addEventListener("click", () => {
   </script>
 </body>
 </html>
+
 
 
 
