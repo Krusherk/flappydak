@@ -367,14 +367,18 @@ footer {
   color: white;
   border-radius: 8px;
   cursor: not-allowed;
-  margin-top: 96px; /* Added to move button down by ~1 inch */
+  margin-top: 96px;
+  transition: background 0.3s ease; /* Added for smooth color change */
 }
 #startBtn:enabled {
   background: black;
   cursor: pointer;
 }
-
+#startBtn:enabled:hover {
+  background: purple; /* Turns purple on hover when enabled */
+}
 </style>
+
 
 
 
