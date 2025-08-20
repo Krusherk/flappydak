@@ -356,28 +356,29 @@ footer {
 <style>
 
 #startBtn {
-  position: relative;
-  top: 30px; /* moves it down about half an inch */
-}
-#startBtn {
   font-size: 16px;
   padding: 10px 20px;
   border: 2px solid white;
-  background: gray;
+  background: gray; /* Default disabled state */
   color: white;
   border-radius: 8px;
   cursor: not-allowed;
   margin-top: 96px;
-  transition: background 0.3s ease; /* Added for smooth color change */
+  transition: all 0.3s ease; /* Smooth transition for all properties */
 }
 #startBtn:enabled {
-  background: black;
+  background: linear-gradient(135deg, #7e30e1, #b983ff); /* Matches provided buttons */
+  border: 2px solid #e0b3ff; /* Matches provided buttons */
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(126, 48, 225, 0.4); /* Matches provided buttons */
 }
 #startBtn:enabled:hover {
-  background: purple; /* Turns purple on hover when enabled */
+  background: linear-gradient(135deg, #9a42f3, #d1a3ff); /* Purple gradient on hover */
+  box-shadow: 0 6px 20px rgba(126, 48, 225, 0.6); /* Enhanced shadow on hover */
+  transform: scale(1.05); /* Slight scale-up on hover */
 }
 </style>
+
 
 
 
