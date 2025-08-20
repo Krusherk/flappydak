@@ -356,8 +356,8 @@ footer {
 <style>
 
 #startBtn {
-  font-size: 16px;
-  padding: 10px 20px;
+  font-size: 14px; /* Reduced from 16px for smaller size */
+  padding: 8px 16px; /* Reduced from 10px 20px for smaller size */
   border: 2px solid white;
   background: gray; /* Disabled state */
   color: white;
@@ -378,6 +378,7 @@ footer {
   transform: scale(1.05); /* Slight scale-up */
 }
 </style>
+
 
 
 
