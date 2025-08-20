@@ -363,7 +363,7 @@ footer {
   color: white;
   border-radius: 8px;
   cursor: not-allowed;
-  margin-top: 192px; /* Lowered by another inch (96px + 96px) */
+  margin-top: 96px; /* Lowered by 1 inch from original position */
   transition: all 0.3s ease; /* Smooth transition for all properties */
 }
 #startBtn:enabled {
@@ -378,6 +378,7 @@ footer {
   transform: scale(1.05); /* Slight scale-up */
 }
 </style>
+
 
 
 
