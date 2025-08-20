@@ -359,25 +359,26 @@ footer {
   font-size: 16px;
   padding: 10px 20px;
   border: 2px solid white;
-  background: gray; /* Default disabled state */
+  background: gray; /* Disabled state */
   color: white;
   border-radius: 8px;
   cursor: not-allowed;
-  margin-top: 96px;
+  margin-top: 96px; /* Keeps button lowered by ~1 inch */
   transition: all 0.3s ease; /* Smooth transition for all properties */
 }
 #startBtn:enabled {
-  background: linear-gradient(135deg, #7e30e1, #b983ff); /* Matches provided buttons */
-  border: 2px solid #e0b3ff; /* Matches provided buttons */
+  background: black; /* Enabled state starts as black */
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(126, 48, 225, 0.4); /* Matches provided buttons */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Subtle shadow for black background */
 }
 #startBtn:enabled:hover {
   background: linear-gradient(135deg, #9a42f3, #d1a3ff); /* Purple gradient on hover */
-  box-shadow: 0 6px 20px rgba(126, 48, 225, 0.6); /* Enhanced shadow on hover */
-  transform: scale(1.05); /* Slight scale-up on hover */
+  border: 2px solid #e0b3ff; /* Matches provided buttons' border */
+  box-shadow: 0 6px 20px rgba(126, 48, 225, 0.6); /* Enhanced purple shadow */
+  transform: scale(1.05); /* Slight scale-up */
 }
 </style>
+
 
 
 
