@@ -363,24 +363,25 @@ footer {
   color: white;
   border-radius: 8px;
   cursor: not-allowed;
-  margin-top: 96px; /* Keeps button lowered by ~1 inch */
-  transition: all 0.3s ease; /* Smooth transition for all properties */
+
+  margin-top: 96px; /* 👈 moves it down ~1 inch */
+  transition: all 0.3s ease;
 }
+
 #startBtn:enabled {
-  background: black; /* Enabled state starts as black */
+  background: black;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Subtle shadow for black */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
+
 #startBtn:enabled:hover {
-  background: linear-gradient(135deg, #9a42f3, #d1a3ff); /* Purple gradient on hover */
-  border: 2px solid #e0b3ff; /* Matches provided buttons' border */
-  box-shadow: 0 6px 20px rgba(126, 48, 225, 0.6); /* Enhanced purple shadow */
-  transform: scale(1.05); /* Slight scale-up */
+  background: linear-gradient(135deg, #9a42f3, #d1a3ff);
+  border: 2px solid #e0b3ff;
+  box-shadow: 0 6px 20px rgba(126, 48, 225, 0.6);
+  transform: scale(1.05);
 }
-</style>
 
-
-
+<style>
 
 
 
