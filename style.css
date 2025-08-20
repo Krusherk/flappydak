@@ -394,11 +394,12 @@ footer {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;  /* content starts at the top */
+  justify-content: flex-start; /* 👈 stops vertical centering */
   align-items: center;
-  padding-top: 120px;           /* pushes the button+text down */
+  padding-top: 120px;         /* 👈 pushes START button down */
   gap: 12px;
 }
+
 .discord-row {
   display: flex;
   gap: 8px;
@@ -408,6 +409,7 @@ footer {
   width: 100%; /* helps flex centering */
 }
 <style>
+
 
 
 
