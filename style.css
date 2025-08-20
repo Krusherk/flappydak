@@ -390,7 +390,15 @@ footer {
   text-shadow: 2px 2px black; /* Stronger outline */
   text-align: center;
 }
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* keeps button + text centered horizontally */
+  justify-content: flex-start; /* content starts from top */
+  margin-top: 120px; /* pushes everything down ~1 inch */
+}
 <style>
+
 
 
 
