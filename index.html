@@ -331,9 +331,50 @@ startBtn.addEventListener("click", () => {
     mainMenu.classList.add("fade-in");
   }, 500); // match transition duration
 });
+
+<button id="startBtn" disabled>START</button>
+<div id="countdown"></div>
+
+<script>
+function setupCountdown() {
+  const now = new Date();
+
+  // Target: tomorrow at 4 PM
+  const target = new Date();
+  target.setDate(now.getDate() + 1);
+  target.setHours(16, 0, 0, 0); // 16:00 = 4 PM
+
+  const startBtn = document.getElementById("startBtn");
+  const countdownEl = document.getElementById("countdown");
+
+  function updateCountdown() {
+    const currentTime = new Date().getTime();
+    const distance = target.getTime() - currentTime;
+
+    if (distance <= 0) {
+      countdownEl.innerText = "✅ Ready to play!";
+      startBtn.disabled = false; // enable button
+      clearInterval(interval);
+      return;
+    }
+
+    // time math
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    countdownEl.innerText = `⏳ Available in: ${hours}h ${minutes}m ${seconds}s`;
+  }
+
+  updateCountdown(); // run once immediately
+  const interval = setInterval(updateCountdown, 1000);
+}
+
+setupCountdown();
   </script>
 </body>
 </html>
+
 
 
 
