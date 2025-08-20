@@ -399,8 +399,16 @@ footer {
   padding-top: 120px; /* pushes content down neatly */
   gap: 12px;
 }
-
+.discord-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center; /* 👈 centers the input + button block */
+  margin-top: 6px;
+  width: 100%; /* helps flex centering */
+}
 <style>
+
 
 
 
