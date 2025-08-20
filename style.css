@@ -363,13 +363,13 @@ footer {
   color: white;
   border-radius: 8px;
   cursor: not-allowed;
-  margin-top: 96px; /* Keeps button lowered by ~1 inch */
+  margin-top: 192px; /* Lowered by another inch (96px + 96px) */
   transition: all 0.3s ease; /* Smooth transition for all properties */
 }
 #startBtn:enabled {
   background: black; /* Enabled state starts as black */
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Subtle shadow for black background */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Subtle shadow for black */
 }
 #startBtn:enabled:hover {
   background: linear-gradient(135deg, #9a42f3, #d1a3ff); /* Purple gradient on hover */
@@ -378,6 +378,7 @@ footer {
   transform: scale(1.05); /* Slight scale-up */
 }
 </style>
+
 
 
 
