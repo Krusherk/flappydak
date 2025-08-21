@@ -29,10 +29,9 @@ message.classList.add('messageStyle');
 
 let score = 0;
 let bird_dy = 0;
-let pipe_separation = 0;
 let pipe_gap = 35;
 let pipes = [];
-let animationFrames = [];
+let frameCount = 0;
 
 // ====== ENFORCE PLAY LIMIT ON GAME END ======
 function deductPlay() {
@@ -51,16 +50,14 @@ function resetGame() {
   bird.style.top = '40vh';
   bird_dy = 0;
   score = 0;
-  pipe_separation = 0;
   pipes = [];
+  frameCount = 0;
   game_state = 'Play';
   score_val.innerHTML = '0';
   score_title.innerHTML = "SCORE";
   message.innerHTML = '';
   message.classList.remove('messageStyle');
   bird_props = bird.getBoundingClientRect();
-  animationFrames.forEach(cancelAnimationFrame);
-  animationFrames = [];
   startGame();
 }
 
@@ -91,58 +88,23 @@ document.addEventListener('touchstart', () => {
   }
 });
 
+// ✅ OPTIMIZED SINGLE GAME LOOP
 function startGame() {
-  function movePipes() {
+  function gameLoop() {
     if (game_state !== 'Play') return;
-    pipes.forEach(pipe => {
-      const pipe_rect = pipe.getBoundingClientRect();
-      if (pipe_rect.right <= 0) {
-        pipe.remove();
-      } else {
-        pipe.style.left = pipe_rect.left - move_speed + 'px';
 
-        if (pipe.increase_score && pipe_rect.right < bird_props.left) {
-          score++;
-          score_val.innerHTML = score;
-          sound_point.play();
-          pipe.increase_score = false;
-        }
-
-        bird_props = bird.getBoundingClientRect();
-        if (
-          bird_props.left < pipe_rect.left + pipe_rect.width &&
-          bird_props.left + bird_props.width > pipe_rect.left &&
-          bird_props.top < pipe_rect.top + pipe_rect.height &&
-          bird_props.top + bird_props.height > pipe_rect.top
-        ) {
-          endGame();
-          return;
-        }
-      }
-    });
-    animationFrames.push(requestAnimationFrame(movePipes));
-  }
-
-  function applyGravity() {
-    if (game_state !== 'Play') return;
+    // Gravity
     bird_dy += gravity;
     let newTop = bird.offsetTop + bird_dy;
-
     if (newTop <= 0 || newTop + bird.clientHeight >= background.height) {
       endGame();
       return;
     }
-
     bird.style.top = newTop + 'px';
     bird_props = bird.getBoundingClientRect();
-    animationFrames.push(requestAnimationFrame(applyGravity));
-  }
 
-  function generatePipes() {
-    if (game_state !== 'Play') return;
-
-    if (pipe_separation > 115) {
-      pipe_separation = 0;
+    // Pipe generation
+    if (frameCount % 115 === 0) {
       const pipe_pos = Math.floor(Math.random() * 43) + 8;
 
       const pipe_top = document.createElement('div');
@@ -158,17 +120,44 @@ function startGame() {
 
       document.body.appendChild(pipe_top);
       document.body.appendChild(pipe_bottom);
-
       pipes.push(pipe_top, pipe_bottom);
     }
 
-    pipe_separation++;
-    animationFrames.push(requestAnimationFrame(generatePipes));
+    // Pipe movement + collision
+    pipes = pipes.filter(pipe => {
+      const pipe_rect = pipe.getBoundingClientRect();
+
+      if (pipe_rect.right <= 0) {
+        pipe.remove();
+        return false;
+      }
+
+      pipe.style.left = pipe_rect.left - move_speed + 'px';
+
+      if (pipe.increase_score && pipe_rect.right < bird_props.left) {
+        score++;
+        score_val.innerHTML = score;
+        sound_point.play();
+        pipe.increase_score = false;
+      }
+
+      if (
+        bird_props.left < pipe_rect.left + pipe_rect.width &&
+        bird_props.left + bird_props.width > pipe_rect.left &&
+        bird_props.top < pipe_rect.top + pipe_rect.height &&
+        bird_props.top + bird_props.height > pipe_rect.top
+      ) {
+        endGame();
+        return false;
+      }
+      return true;
+    });
+
+    frameCount++;
+    requestAnimationFrame(gameLoop);
   }
 
-  animationFrames.push(requestAnimationFrame(movePipes));
-  animationFrames.push(requestAnimationFrame(applyGravity));
-  animationFrames.push(requestAnimationFrame(generatePipes));
+  requestAnimationFrame(gameLoop);
 }
 
 function submitScore() {
@@ -177,9 +166,9 @@ function submitScore() {
   if (typeof saveScoreToFirebase === "function") {
     saveScoreToFirebase(score);
   }
-}
-if (score > highscore) {
-  highscore = score;
-  localStorage.setItem("flappy_highscore", highscore.toString());
-}
 
+  if (score > highscore) {
+    highscore = score;
+    localStorage.setItem("flappy_highscore", highscore.toString());
+  }
+}
