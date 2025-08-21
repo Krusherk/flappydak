@@ -409,6 +409,24 @@ footer {
   width: 100%; /* helps flex centering */
 }
 <style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;        /* take full viewport */
+  overflow: hidden;    /* stop scrollbars */
+}
+
+.background {
+  position: fixed;       /* pin it to screen */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url('images/background-img.png') no-repeat center center;
+  background-size: cover;   /* fill screen */
+  z-index: -1;              /* stay behind game */
+}
+<style>
 
 
 
