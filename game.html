@@ -42,6 +42,9 @@ window.saveScoreToFirebase = function(score) {
         wallet: wallet,
         score,
         timestamp: Date.now()
+      }).then(() => {
+        // ✅ Immediately refresh leaderboard
+        loadLeaderboard();
       });
     }
   });
@@ -101,11 +104,11 @@ window.loadLeaderboard = function () {
           : discordData[walletLower]?.username || entry.name || entry.wallet;
 
       const li = document.createElement("li");
-li.innerHTML = `
-  <span class="rank">#${index + 1}</span> 
-  <span class="leaderboard-player">${displayName}</span>
-  <span class="leaderboard-score">${entry.score}</span>
-`;
+      li.innerHTML = `
+        <span class="rank">#${index + 1}</span> 
+        <span class="leaderboard-player">${displayName}</span>
+        <span class="leaderboard-score">${entry.score}</span>
+      `;
       leaderboardList.appendChild(li);
     });
   });
