@@ -81,33 +81,32 @@
           }
         });
 
-        // Show my score on top (gold) if not in top 10
-        const isInTop10 = scores.some(s => s.wallet?.toLowerCase() === myWallet);
-        if (currentUserEntry && !isInTop10) {
-          const li = document.createElement("li");
-          li.innerHTML = <strong>${currentUserEntry.name}</strong> ${currentUserEntry.score};
-          li.style.color = "#FFD700"; // gold
-          leaderboardList.appendChild(li);
-        }
+// Show my score on top (gold) if not in top 10
+const isInTop10 = scores.some(s => s.wallet?.toLowerCase() === myWallet);
+if (currentUserEntry && !isInTop10) {
+  const li = document.createElement("li");
+  li.innerHTML = `<strong>${currentUserEntry.name}</strong> ${currentUserEntry.score}`;
+  li.style.color = "#FFD700"; // gold
+  leaderboardList.appendChild(li);
+}
 
-        // Show top 10 list
-        scores.forEach((entry, index) => {
-          const walletLower = entry.wallet?.toLowerCase();
-          const displayName =
-            walletLower === myWallet
-              ? currentUserEntry?.name
-              : discordData[walletLower]?.username || entry.name || entry.wallet;
+// Show top 10 list
+scores.forEach((entry, index) => {
+  const walletLower = entry.wallet?.toLowerCase();
+  const displayName =
+    walletLower === myWallet
+      ? currentUserEntry?.name
+      : discordData[walletLower]?.username || entry.name || entry.wallet;
 
-          const li = document.createElement("li");
-          li.innerHTML =
-            <span class="rank">#${index + 1}</span>
-            <span class="leaderboard-player">${displayName}</span>
-            <span class="leaderboard-score">${entry.score}</span>
-          ;
-          leaderboardList.appendChild(li);
-        });
-      });
-    };
+  const li = document.createElement("li");
+  li.innerHTML = `
+    <span class="rank">#${index + 1}</span>
+    <span class="leaderboard-player">${displayName}</span>
+    <span class="leaderboard-score">${entry.score}</span>
+  `;
+  leaderboardList.appendChild(li);
+});
+
 
     window.addEventListener("DOMContentLoaded", () => {
       loadLeaderboard();
