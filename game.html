@@ -11,7 +11,7 @@
   <!-- Firebase Leaderboard Integration -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, set, query, orderByChild, limitToLast, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, set, query, orderByChild, limitToLast, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBJC8jBpf4RJcrjAhgYumUmYzlOxma-ojk",
@@ -33,7 +33,6 @@
       const playerName = discordName || wallet;
 
       const scoresRef = ref(db, "scores/" + wallet);
-
       get(scoresRef).then(snapshot => {
         const existing = snapshot.exists() ? snapshot.val().score : 0;
         if (score > existing) {
@@ -42,16 +41,12 @@
             wallet: wallet,
             score,
             timestamp: Date.now()
-          }).then(() => {
-            // ✅ Refresh leaderboard once
-            loadLeaderboard();
           });
         }
       });
     };
 
-    // ✅ One-time fetch version (no duplicate rows)
-    window.loadLeaderboard = async function () {
+    window.loadLeaderboard = function () {
       const leaderboardList = document.getElementById("leaderboardList");
       leaderboardList.innerHTML = "<li>Loading...</li>";
 
@@ -61,55 +56,56 @@
       const scoresRef = ref(db, "scores");
       const topScoresQuery = query(scoresRef, orderByChild("score"), limitToLast(10));
 
-      const snapshot = await get(topScoresQuery);
+      onValue(topScoresQuery, async (snapshot) => {
+        const scores = [];
+        snapshot.forEach((child) => {
+          scores.push(child.val());
+        });
+        scores.reverse(); // highest first
+        leaderboardList.innerHTML = "";
 
-      const scores = [];
-      snapshot.forEach((child) => {
-        scores.push(child.val());
-      });
-      scores.reverse(); // highest first
-      leaderboardList.innerHTML = "";
+        // Fetch all Discord usernames from DB
+        const discordSnap = await get(ref(db, "discordUsernames"));
+        const discordData = discordSnap.exists() ? discordSnap.val() : {};
 
-      const discordSnap = await get(ref(db, "discordUsernames"));
-      const discordData = discordSnap.exists() ? discordSnap.val() : {};
+        // Find my entry in full scores list
+        const allScoresSnap = await get(scoresRef);
+        let currentUserEntry = null;
+        allScoresSnap.forEach(child => {
+          const val = child.val();
+          if (val.wallet?.toLowerCase() === myWallet) {
+            currentUserEntry = {
+              ...val,
+              name: myDiscord || discordData[myWallet]?.username || val.name || val.wallet
+            };
+          }
+        });
 
-      // Find my entry
-      const allScoresSnap = await get(scoresRef);
-      let currentUserEntry = null;
-      allScoresSnap.forEach(child => {
-        const val = child.val();
-        if (val.wallet?.toLowerCase() === myWallet) {
-          currentUserEntry = {
-            ...val,
-            name: myDiscord || discordData[myWallet]?.username || val.name || val.wallet
-          };
+        // Show my score on top (gold) if not in top 10
+        const isInTop10 = scores.some(s => s.wallet?.toLowerCase() === myWallet);
+        if (currentUserEntry && !isInTop10) {
+          const li = document.createElement("li");
+          li.innerHTML = <strong>${currentUserEntry.name}</strong> ${currentUserEntry.score};
+          li.style.color = "#FFD700"; // gold
+          leaderboardList.appendChild(li);
         }
-      });
 
-      // Show my score if not in top 10
-      const isInTop10 = scores.some(s => s.wallet?.toLowerCase() === myWallet);
-      if (currentUserEntry && !isInTop10) {
-        const li = document.createElement("li");
-        li.innerHTML = `<strong>${currentUserEntry.name}</strong> ${currentUserEntry.score}`;
-        li.style.color = "#FFD700"; // gold
-        leaderboardList.appendChild(li);
-      }
+        // Show top 10 list
+        scores.forEach((entry, index) => {
+          const walletLower = entry.wallet?.toLowerCase();
+          const displayName =
+            walletLower === myWallet
+              ? currentUserEntry?.name
+              : discordData[walletLower]?.username || entry.name || entry.wallet;
 
-      // Show top 10
-      scores.forEach((entry, index) => {
-        const walletLower = entry.wallet?.toLowerCase();
-        const displayName =
-          walletLower === myWallet
-            ? currentUserEntry?.name
-            : discordData[walletLower]?.username || entry.name || entry.wallet;
-
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <span class="rank">#${index + 1}</span> 
-          <span class="leaderboard-player">${displayName}</span>
-          <span class="leaderboard-score">${entry.score}</span>
-        `;
-        leaderboardList.appendChild(li);
+          const li = document.createElement("li");
+          li.innerHTML =
+            <span class="rank">#${index + 1}</span>
+            <span class="leaderboard-player">${displayName}</span>
+            <span class="leaderboard-score">${entry.score}</span>
+          ;
+          leaderboardList.appendChild(li);
+        });
       });
     };
 
@@ -148,13 +144,13 @@
 
   <script src="script.js" defer></script>
 </head>
-
 <body>
   <div class="background"></div>
   <img src="images/Bird-2.svg" alt="bird-img" class="bird" id="bird-1" width="300">
 
   <div class="message">
-    Press Enter To Start Game <p><span style="color: red;">&uarr;</span> ArrowUp to Control</p>
+    Press Enter To Start Game
+    <p><span style="color: red;">&uarr;</span> ArrowUp to Control</p>
   </div>
 
   <div class="score">
@@ -175,4 +171,3 @@
   </div>
 </body>
 </html>
-
