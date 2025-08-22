@@ -87,7 +87,7 @@ window.loadLeaderboard = function () {
     const isInTop10 = scores.some(s => s.wallet?.toLowerCase() === myWallet);
     if (currentUserEntry && !isInTop10) {
       const li = document.createElement("li");
-      li.innerHTML = `<strong>${currentUserEntry.name}</strong> - ${currentUserEntry.score}`;
+      li.innerHTML = `<strong>${currentUserEntry.name}</strong>  ${currentUserEntry.score}`;
       li.style.color = "#FFD700"; // gold
       leaderboardList.appendChild(li);
     }
@@ -163,7 +163,7 @@ window.addEventListener("DOMContentLoaded", () => {
   <div class="leaderboard">
     <div class="leaderboard-header">
       <h2>LEADERBOARD</h2>
-      <p class="subtext">Only top players are displayed</p>
+      <p class="subtext">Only top players get rewards</p>
       <div class="leaderboard-toggle">
         <button class="toggle-btn active" id="highScoreBtn">Game Rank</button>
         <button class="toggle-btn" id="maxDistanceBtn">High Score</button>
