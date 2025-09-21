@@ -83,9 +83,10 @@
   </footer>
 
   <script>
-    // ✅ Init Privy
+    // ✅ Init Privy (App ID pulled from env in Vercel, fallback for localhost)
+    const appId = window?.ENV_PRIVY_APP_ID || "cmftjdco700aele0cj2depgc3";
     const privy = new Privy({
-      appId: "cmftjdco700aele0cj2depgc3", // replace with your real Privy App ID
+      appId,
       config: {
         appearance: { theme: "dark" },
         loginMethods: ["wallet"],
