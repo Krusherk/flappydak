@@ -18,14 +18,14 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      background-attachment: fixed; /* keeps background locked */
+      background-attachment: fixed;
       font-family: 'Press Start 2P', cursive;
       color: white;
       text-align: center;
-      overflow: hidden; /* prevents scrollbars */
+      overflow: hidden;
     }
 
-    body, h1, .start-btn, footer {
+    body, h1, .btn, footer {
       -webkit-font-smoothing: none;
       -moz-osx-font-smoothing: grayscale;
       font-smooth: never;
@@ -38,11 +38,6 @@
       justify-content: center;
       align-items: center;
       gap: 12px;
-    }
-
-    h1 {
-      font-size: 22px;
-      text-shadow: 2px 2px black;
     }
 
     .btn {
@@ -76,6 +71,7 @@
   <div class="home-container">
     <!-- Login + Start buttons -->
     <button id="loginBtn" class="btn">Login with Privy</button>
+    <button id="logoutBtn" class="btn" style="display:none;">Logout</button>
     <div id="walletAddress"></div>
     <div id="usernameStatus"></div>
     <button id="startBtn" class="btn" disabled>START</button>
@@ -87,73 +83,82 @@
   </footer>
 
   <script>
-    // ✅ Init Privy (replace with your real appId)
+    // ✅ Init Privy
     const privy = new Privy({
-      appId: "cmftjdco700aele0cj2depgc3",
+      appId: "cmftjdco700aele0cj2depgc3", // replace with your real Privy App ID
       config: {
         appearance: { theme: "dark" },
-        loginMethods: ["wallet"], // just wallet for now
+        loginMethods: ["wallet"],
       },
     });
 
-    // 🔎 Check wallet against Monad Games API
     async function getMonadGamesUser(walletAddress) {
-      if (!walletAddress) {
-        return { user: null, hasUsername: false, error: null };
-      }
-
       try {
         const response = await fetch(
           `https://monadclip.fun/api/check-wallet?wallet=${walletAddress}`
         );
-
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-        const data = await response.json();
-        return {
-          user: data.user || null,
-          hasUsername: data.hasUsername,
-          error: null,
-        };
+        return await response.json();
       } catch (err) {
         console.error("Fetch error:", err);
-        return { user: null, hasUsername: false, error: err.message };
+        return { hasUsername: false, user: null, error: err.message };
       }
     }
 
-    // DOM elements
     const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
     const startBtn = document.getElementById("startBtn");
     const walletAddressEl = document.getElementById("walletAddress");
     const usernameStatusEl = document.getElementById("usernameStatus");
 
-    // 🟢 Handle login
+    // 🟢 Login
     loginBtn.addEventListener("click", async () => {
       try {
         const user = await privy.login();
-        const walletAddress = user.wallet?.address;
+        const walletAddress = user?.wallets?.[0]?.address;
+
+        if (!walletAddress) {
+          walletAddressEl.innerText = "❌ No wallet found";
+          return;
+        }
 
         walletAddressEl.innerText = "Connected: " + walletAddress;
 
-        // Check username status
+        // Check username
+        usernameStatusEl.innerText = "⏳ Checking username...";
         const result = await getMonadGamesUser(walletAddress);
+
         if (result.hasUsername) {
           usernameStatusEl.innerText = `✅ Username: ${result.user.username}`;
-          startBtn.disabled = false; // allow starting game
+          startBtn.disabled = false;
         } else {
           usernameStatusEl.innerText = "⚠️ No username linked. Please set one.";
           startBtn.disabled = true;
         }
+
+        // Toggle buttons
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
       } catch (err) {
         console.error("Privy login failed:", err);
       }
     });
 
-    // 🎮 Start button redirects to game
+    // 🔴 Logout
+    logoutBtn.addEventListener("click", () => {
+      privy.logout();
+      walletAddressEl.innerText = "";
+      usernameStatusEl.innerText = "";
+      startBtn.disabled = true;
+
+      loginBtn.style.display = "inline-block";
+      logoutBtn.style.display = "none";
+    });
+
+    // 🎮 Start game
     startBtn.addEventListener("click", () => {
       window.location.href = "game.html";
     });
   </script>
 </body>
 </html>
-
