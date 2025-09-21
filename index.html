@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
+  <!-- Privy SDK -->
+  <script src="https://unpkg.com/@privy-io/js-sdk"></script>
+
   <style>
     body {
       margin: 0;
@@ -20,12 +23,6 @@
       color: white;
       text-align: center;
       overflow: hidden;
-    }
-
-    body, h1, .btn, footer {
-      -webkit-font-smoothing: none;
-      -moz-osx-font-smoothing: grayscale;
-      font-smooth: never;
     }
 
     .home-container {
@@ -66,7 +63,6 @@
 
 <body>
   <div class="home-container">
-    <!-- Login + Start buttons -->
     <button id="loginBtn" class="btn">Login with Privy</button>
     <button id="logoutBtn" class="btn" style="display:none;">Logout</button>
     <div id="walletAddress"></div>
@@ -79,67 +75,68 @@
     <a href="https://x.com/0xqowiyy" target="_blank" class="pixel-text link-text"> Crack</a>
   </footer>
 
- <script src="https://unpkg.com/@privy-io/js-sdk"></script>
-<script>
-  // ✅ Init Privy for vanilla JS
-  const privy = Privy.init({
-    appId: "cmftjdco700aele0cj2depgc3", // your real Privy App ID
-  });
+  <script>
+    // ✅ Initialize Privy client
+    const privyClient = Privy.init({
+      appId: "cmftjdco700aele0cj2depgc3", // your app ID
+    });
 
-  const loginBtn = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const startBtn = document.getElementById("startBtn");
-  const walletAddressEl = document.getElementById("walletAddress");
-  const usernameStatusEl = document.getElementById("usernameStatus");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const startBtn = document.getElementById("startBtn");
+    const walletAddressEl = document.getElementById("walletAddress");
+    const usernameStatusEl = document.getElementById("usernameStatus");
 
-  // 🟢 Login
-  loginBtn.addEventListener("click", async () => {
-    try {
-      const result = await privy.login();  // <-- correct for JS SDK
-      console.log("Privy login result:", result);
+    // 🟢 Login
+    loginBtn.addEventListener("click", async () => {
+      try {
+        const { user } = await privyClient.login(); // <-- correct method
+        console.log("Privy user:", user);
 
-      const walletAddress = result?.user?.wallet?.address;
-      if (!walletAddress) {
-        walletAddressEl.innerText = "❌ No wallet found";
-        return;
+        const walletAddress = user?.wallet?.address;
+        if (!walletAddress) {
+          walletAddressEl.innerText = "❌ No wallet found";
+          return;
+        }
+
+        walletAddressEl.innerText = "Connected: " + walletAddress;
+
+        // 🔎 Check username
+        usernameStatusEl.innerText = "⏳ Checking username...";
+        const response = await fetch(`https://monadclip.fun/api/check-wallet?wallet=${walletAddress}`);
+        const data = await response.json();
+
+        if (data.hasUsername) {
+          usernameStatusEl.innerText = `✅ Username: ${data.user.username}`;
+          startBtn.disabled = false;
+        } else {
+          usernameStatusEl.innerText = "⚠️ No username linked. Please set one.";
+          startBtn.disabled = true;
+        }
+
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+      } catch (err) {
+        console.error("Privy login failed:", err);
+        alert("Login failed. Check console.");
       }
+    });
 
-      walletAddressEl.innerText = "Connected: " + walletAddress;
+    // 🔴 Logout
+    logoutBtn.addEventListener("click", () => {
+      privyClient.logout();
+      walletAddressEl.innerText = "";
+      usernameStatusEl.innerText = "";
+      startBtn.disabled = true;
 
-      // 🔎 Check username on your API
-      usernameStatusEl.innerText = "⏳ Checking username...";
-      const response = await fetch(`https://monadclip.fun/api/check-wallet?wallet=${walletAddress}`);
-      const data = await response.json();
+      loginBtn.style.display = "inline-block";
+      logoutBtn.style.display = "none";
+    });
 
-      if (data.hasUsername) {
-        usernameStatusEl.innerText = `✅ Username: ${data.user.username}`;
-        startBtn.disabled = false;
-      } else {
-        usernameStatusEl.innerText = "⚠️ No username linked. Please set one.";
-        startBtn.disabled = true;
-      }
-
-      // toggle buttons
-      loginBtn.style.display = "none";
-      logoutBtn.style.display = "inline-block";
-    } catch (err) {
-      console.error("Privy login failed:", err);
-    }
-  });
-
-  // 🔴 Logout
-  logoutBtn.addEventListener("click", () => {
-    privy.logout();
-    walletAddressEl.innerText = "";
-    usernameStatusEl.innerText = "";
-    startBtn.disabled = true;
-
-    loginBtn.style.display = "inline-block";
-    logoutBtn.style.display = "none";
-  });
-
-  // 🎮 Start game
-  startBtn.addEventListener("click", () => {
-    window.location.href = "game.html";
-  });
-</script>
+    // 🎮 Start game
+    startBtn.addEventListener("click", () => {
+      window.location.href = "game.html";
+    });
+  </script>
+</body>
+</html>
