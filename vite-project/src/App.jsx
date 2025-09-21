@@ -16,7 +16,7 @@ function LoginPage() {
       if (user?.wallet?.address) {
         setStatus(`✅ Connected: ${user.wallet.address}`);
         // Redirect to your HTML game after login
-        window.location.href = "/game.html";
+        window.location.href = "/index.html"; 
       }
     } catch (err) {
       console.error("Privy login failed:", err);
@@ -25,15 +25,21 @@ function LoginPage() {
   }
 
   return (
-    <div style={{ 
-      display: "flex", flexDirection: "column", 
-      alignItems: "center", justifyContent: "center", 
-      height: "100vh", background: "black", color: "white" 
-    }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+        background: "black",
+        color: "white",
+      }}
+    >
       <h1 style={{ fontFamily: "'Press Start 2P', cursive" }}>Flappy Dak</h1>
       {!authenticated ? (
-        <button 
-          onClick={handleLogin} 
+        <button
+          onClick={handleLogin}
           style={{
             padding: "12px 20px",
             border: "2px solid white",
@@ -41,13 +47,14 @@ function LoginPage() {
             color: "white",
             borderRadius: "8px",
             cursor: "pointer",
-            marginTop: "20px"
-          }}>
+            marginTop: "20px",
+          }}
+        >
           Login with Privy
         </button>
       ) : (
-        <button 
-          onClick={logout} 
+        <button
+          onClick={logout}
           style={{
             padding: "12px 20px",
             border: "2px solid white",
@@ -55,8 +62,9 @@ function LoginPage() {
             color: "white",
             borderRadius: "8px",
             cursor: "pointer",
-            marginTop: "20px"
-          }}>
+            marginTop: "20px",
+          }}
+        >
           Logout
         </button>
       )}
