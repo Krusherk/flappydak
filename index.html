@@ -42,6 +42,12 @@
       color: white;
       cursor: pointer;
       border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: white;
+      color: black;
     }
 
     #walletAddress, #usernameStatus {
@@ -76,10 +82,10 @@
   </footer>
 
   <script>
-    // ✅ Initialize Privy client
-    const privyClient = Privy.init({
-      appId: "cmftjdco700aele0cj2depgc3", // your app ID
-    });
+    // ✅ Initialize Privy client (vanilla JS SDK)
+ const privyClient = Privy.init({
+  appId: "cmd8euall0037le0my79qpz42", // your real app ID
+});
 
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
@@ -90,8 +96,8 @@
     // 🟢 Login
     loginBtn.addEventListener("click", async () => {
       try {
-        const { user } = await privyClient.login(); // <-- correct method
-        console.log("Privy user:", user);
+        const { user } = await privy.login();
+        console.log("Privy login result:", user);
 
         const walletAddress = user?.wallet?.address;
         if (!walletAddress) {
@@ -101,7 +107,7 @@
 
         walletAddressEl.innerText = "Connected: " + walletAddress;
 
-        // 🔎 Check username
+        // 🔎 Check username from your API
         usernameStatusEl.innerText = "⏳ Checking username...";
         const response = await fetch(`https://monadclip.fun/api/check-wallet?wallet=${walletAddress}`);
         const data = await response.json();
@@ -118,13 +124,13 @@
         logoutBtn.style.display = "inline-block";
       } catch (err) {
         console.error("Privy login failed:", err);
-        alert("Login failed. Check console.");
+        alert("Login failed. Check console for details.");
       }
     });
 
     // 🔴 Logout
     logoutBtn.addEventListener("click", () => {
-      privyClient.logout();
+      privy.logout();
       walletAddressEl.innerText = "";
       usernameStatusEl.innerText = "";
       startBtn.disabled = true;
