@@ -1,35 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { PrivyProvider, usePrivy, useLogin, useLogout } from "@privy-io/react-auth";
 
-function App() {
-  const [count, setCount] = useState(0)
+function LoginPage() {
+  const { ready, authenticated, user } = usePrivy();
+  const { login } = useLogin();
+  const { logout } = useLogout();
+
+  const [status, setStatus] = useState("");
+
+  if (!ready) return <div>Loading...</div>;
+
+  async function handleLogin() {
+    try {
+      await login();
+      if (user?.wallet?.address) {
+        setStatus(`✅ Connected: ${user.wallet.address}`);
+        // Redirect to your HTML game after login
+        window.location.href = "/game.html";
+      }
+    } catch (err) {
+      console.error("Privy login failed:", err);
+      setStatus("❌ Login failed, check console.");
+    }
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div style={{ 
+      display: "flex", flexDirection: "column", 
+      alignItems: "center", justifyContent: "center", 
+      height: "100vh", background: "black", color: "white" 
+    }}>
+      <h1 style={{ fontFamily: "'Press Start 2P', cursive" }}>Flappy Dak</h1>
+      {!authenticated ? (
+        <button 
+          onClick={handleLogin} 
+          style={{
+            padding: "12px 20px",
+            border: "2px solid white",
+            background: "black",
+            color: "white",
+            borderRadius: "8px",
+            cursor: "pointer",
+            marginTop: "20px"
+          }}>
+          Login with Privy
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      ) : (
+        <button 
+          onClick={logout} 
+          style={{
+            padding: "12px 20px",
+            border: "2px solid white",
+            background: "red",
+            color: "white",
+            borderRadius: "8px",
+            cursor: "pointer",
+            marginTop: "20px"
+          }}>
+          Logout
+        </button>
+      )}
+      <p style={{ marginTop: "10px", fontSize: "12px" }}>{status}</p>
+    </div>
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <PrivyProvider appId="cmd8euall0037le0my79qpz42">
+      <LoginPage />
+    </PrivyProvider>
+  );
+}
