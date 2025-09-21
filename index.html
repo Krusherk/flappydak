@@ -83,16 +83,16 @@
   </footer>
 
   <script>
-    // ✅ Init Privy (App ID pulled from env in Vercel, fallback for localhost)
-    const appId = window?.ENV_PRIVY_APP_ID || "cmftjdco700aele0cj2depgc3";
+    // ✅ Init Privy (App ID is safe to hardcode)
     const privy = new Privy({
-      appId,
+      appId: "cmftjdco700aele0cj2depgc3",
       config: {
         appearance: { theme: "dark" },
         loginMethods: ["wallet"],
       },
     });
 
+    // 🔎 Check username with Monad Games API
     async function getMonadGamesUser(walletAddress) {
       try {
         const response = await fetch(
@@ -106,6 +106,7 @@
       }
     }
 
+    // DOM elements
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
     const startBtn = document.getElementById("startBtn");
