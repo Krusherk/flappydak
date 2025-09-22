@@ -7,9 +7,6 @@
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
-  <!-- Privy SDK -->
-  <script src="https://unpkg.com/@privy-io/js-sdk"></script>
-
   <style>
     body {
       margin: 0;
@@ -86,12 +83,6 @@
       max-width: 400px;
     }
 
-    .wallet-short {
-      font-size: 14px;
-      color: #00eaff;
-      margin: 5px 0;
-    }
-
     .username-display {
       font-size: 16px;
       color: #FFD700;
@@ -121,11 +112,6 @@
     .register-link:hover {
       background: #c0392b;
       transform: scale(1.05);
-    }
-
-    .loading {
-      opacity: 0.7;
-      pointer-events: none;
     }
 
     .status-message {
@@ -174,7 +160,7 @@
     <button id="logoutBtn" class="btn" style="display:none;">Logout</button>
     
     <div id="userInfoCard" class="user-info-card" style="display: none;">
-      <div id="walletAddress" class="wallet-short"></div>
+      <div id="walletAddress"></div>
       <div id="usernameStatus"></div>
     </div>
     
@@ -189,15 +175,10 @@
   </footer>
 
   <script>
-    // Initialize Privy client with proper configuration
-    const privyClient = Privy.init({
-      appId: "cmd8euall0037le0my79qpz42", // Your Privy app ID
-      config: {
-        loginMethodsAndOrder: {
-          primary: ["privy:cmd8euall0037le0my79qpz42"] // Monad Games ID Cross App ID
-        }
-      }
-    });
+    // Initialize Privy with your credentials
+    let privyClient = null;
+    let currentUser = null;
+    let monadGamesUser = null;
 
     // DOM elements
     const loginBtn = document.getElementById("loginBtn");
@@ -208,10 +189,6 @@
     const userInfoCard = document.getElementById("userInfoCard");
     const statusMessages = document.getElementById("statusMessages");
 
-    let currentUser = null;
-    let monadGamesUser = null;
-    let isLoading = false;
-
     // Utility functions
     function showStatusMessage(message, type) {
       const messageDiv = document.createElement('div');
@@ -219,7 +196,6 @@
       messageDiv.textContent = message;
       statusMessages.appendChild(messageDiv);
       
-      // Remove after 5 seconds
       setTimeout(() => {
         if (messageDiv.parentNode) {
           messageDiv.parentNode.removeChild(messageDiv);
@@ -227,29 +203,101 @@
       }, 5000);
     }
 
-    function setLoading(loading) {
-      isLoading = loading;
-      document.body.classList.toggle('loading', loading);
-      
-      if (loading) {
-        loginBtn.disabled = true;
-        logoutBtn.disabled = true;
-        startBtn.disabled = true;
-      } else {
-        loginBtn.disabled = false;
-        logoutBtn.disabled = false;
-        updateStartButtonState();
-      }
-    }
-
-    function updateStartButtonState() {
-      // Enable start button only if user is connected and has username
-      startBtn.disabled = !currentUser || !monadGamesUser;
-    }
-
     function formatWalletAddress(address) {
       if (!address) return '';
       return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+    }
+
+    function updateStartButtonState() {
+      startBtn.disabled = !currentUser || !monadGamesUser;
+    }
+
+    // Initialize Privy Web SDK
+    async function initPrivy() {
+      try {
+        showStatusMessage('Initializing Privy SDK...', 'info');
+        
+        // Wait for Privy to be available
+        let attempts = 0;
+        while (typeof Privy === 'undefined' && attempts < 10) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+          attempts++;
+        }
+        
+        if (typeof Privy === 'undefined') {
+          throw new Error('Privy SDK failed to load');
+        }
+        
+        // Initialize Privy client with your credentials
+        privyClient = new Privy({
+          appId: "cmftjdco700aele0cj2depgc3", // Your actual Privy App ID
+          config: {
+            loginMethodsAndOrder: {
+              primary: ["privy:cmd8euall0037le0my79qpz42"] // Monad Games ID
+            },
+            appearance: {
+              theme: 'dark',
+              accentColor: '#7e30e1',
+            }
+          }
+        });
+        
+        console.log('Privy client initialized:', privyClient);
+        showStatusMessage('Privy SDK ready!', 'success');
+        
+        // Check for existing authentication
+        await checkExistingAuth();
+        
+      } catch (error) {
+        console.error('Failed to initialize Privy:', error);
+        showStatusMessage('Failed to initialize wallet SDK. Please refresh.', 'error');
+      }
+    }
+
+    // Check for existing authentication
+    async function checkExistingAuth() {
+      try {
+        if (privyClient && await privyClient.isAuthenticated()) {
+          const user = await privyClient.getUser();
+          if (user) {
+            handleAuthSuccess(user);
+          }
+        }
+      } catch (error) {
+        console.log('No existing authentication found');
+      }
+    }
+
+    // Handle successful authentication
+    async function handleAuthSuccess(user) {
+      currentUser = user;
+      console.log('User authenticated:', user);
+      
+      // Get wallet address (embedded wallet or connected wallet)
+      const walletAddress = user.wallet?.address || user.linkedAccounts?.find(acc => acc.type === 'wallet')?.address;
+      
+      if (!walletAddress) {
+        showStatusMessage('No wallet found. Please try again.', 'error');
+        return;
+      }
+
+      // Store wallet address
+      localStorage.setItem("flappy_wallet", walletAddress);
+      
+      // Update UI
+      walletAddressEl.innerHTML = `
+        <div style="color: #00eaff;">💎 Monad Games ID Connected</div>
+        <div style="font-size: 10px;">${formatWalletAddress(walletAddress)}</div>
+      `;
+      
+      userInfoCard.style.display = 'block';
+      loginBtn.style.display = "none";
+      logoutBtn.style.display = "inline-block";
+
+      showStatusMessage('Successfully connected to Monad Games ID!', 'success');
+      
+      // Check for username
+      await checkMonadGamesUser(walletAddress);
     }
 
     // Check Monad Games User via API
@@ -300,64 +348,40 @@
     }
 
     // Login with Privy
-    loginBtn.addEventListener("click", async () => {
-      if (isLoading) return;
-      
-      setLoading(true);
+    async function loginWithPrivy() {
+      if (!privyClient) {
+        showStatusMessage('Privy SDK not ready. Please refresh the page.', 'error');
+        return;
+      }
       
       try {
+        loginBtn.disabled = true;
         showStatusMessage('Connecting to Monad Games ID...', 'info');
         
-        // Use the initialized privyClient for login
+        // Trigger Privy login with Monad Games ID
         const result = await privyClient.login();
         console.log("Privy login result:", result);
 
-        if (!result.user) {
-          throw new Error('Login failed: No user returned');
+        if (result && result.user) {
+          await handleAuthSuccess(result.user);
+        } else {
+          throw new Error('Login failed - no user returned');
         }
-
-        currentUser = result.user;
-        const walletAddress = currentUser.wallet?.address;
-        
-        if (!walletAddress) {
-          throw new Error('No wallet address found');
-        }
-
-        // Store wallet address for the game
-        localStorage.setItem("flappy_wallet", walletAddress);
-        
-        // Update UI
-        walletAddressEl.innerHTML = `
-          <div style="color: #00eaff;">💎 Wallet Connected</div>
-          <div style="font-size: 10px;">${formatWalletAddress(walletAddress)}</div>
-        `;
-        
-        userInfoCard.style.display = 'block';
-        loginBtn.style.display = "none";
-        logoutBtn.style.display = "inline-block";
-
-        showStatusMessage('Successfully connected to Monad Games ID!', 'success');
-        
-        // Check for username
-        await checkMonadGamesUser(walletAddress);
 
       } catch (error) {
         console.error("Privy login failed:", error);
         showStatusMessage(`Login failed: ${error.message}`, 'error');
-        
-        // Reset state on error
         currentUser = null;
         monadGamesUser = null;
         updateStartButtonState();
-        
       } finally {
-        setLoading(false);
+        loginBtn.disabled = false;
       }
-    });
+    }
 
     // Logout
-    logoutBtn.addEventListener("click", async () => {
-      if (isLoading) return;
+    async function logout() {
+      if (!privyClient) return;
       
       try {
         await privyClient.logout();
@@ -368,6 +392,7 @@
         
         // Clear stored data
         localStorage.removeItem("flappy_wallet");
+        localStorage.removeItem("flappy_discord");
         
         // Update UI
         walletAddressEl.innerHTML = "";
@@ -377,15 +402,18 @@
         logoutBtn.style.display = "none";
         
         updateStartButtonState();
-        showStatusMessage('Wallet disconnected', 'info');
+        showStatusMessage('Logged out successfully', 'info');
         
       } catch (error) {
         console.error("Logout failed:", error);
         showStatusMessage('Logout failed', 'error');
       }
-    });
+    }
 
-    // Start game
+    // Event Listeners
+    loginBtn.addEventListener("click", loginWithPrivy);
+    logoutBtn.addEventListener("click", logout);
+
     startBtn.addEventListener("click", () => {
       if (!currentUser || !monadGamesUser) {
         showStatusMessage('Please connect wallet and register username first!', 'error');
@@ -394,47 +422,21 @@
       
       // Store user data for the game
       localStorage.setItem("flappy_discord", monadGamesUser.username);
-      localStorage.setItem("flappy_wallet", currentUser.wallet.address);
+      localStorage.setItem("flappy_wallet", currentUser.wallet?.address || currentUser.linkedAccounts?.find(acc => acc.type === 'wallet')?.address);
       
-      // For now, bypass payment system - you can add this back later
+      // Bypass payment system for testing
       localStorage.setItem("flappy_paid", "true");
       localStorage.setItem("flappy_plays", "999");
       
       showStatusMessage('Starting game...', 'success');
       
-      // Small delay for better UX
       setTimeout(() => {
         window.location.href = "game.html";
       }, 1000);
     });
 
-    // Check if user is already logged in on page load
-    window.addEventListener('load', async () => {
-      try {
-        // Check if Privy has an active session
-        if (privyClient.user) {
-          currentUser = privyClient.user;
-          const walletAddress = currentUser.wallet?.address;
-          
-          if (walletAddress) {
-            localStorage.setItem("flappy_wallet", walletAddress);
-            
-            walletAddressEl.innerHTML = `
-              <div style="color: #00eaff;">💎 Wallet Connected</div>
-              <div style="font-size: 10px;">${formatWalletAddress(walletAddress)}</div>
-            `;
-            
-            userInfoCard.style.display = 'block';
-            loginBtn.style.display = "none";
-            logoutBtn.style.display = "inline-block";
-            
-            await checkMonadGamesUser(walletAddress);
-          }
-        }
-      } catch (error) {
-        console.log('No existing session found');
-      }
-    });
+    // Initialize when page loads
+    window.addEventListener('load', initPrivy);
   </script>
 </body>
 </html>
